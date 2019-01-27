@@ -628,12 +628,17 @@ namespace XMindAPI
 
         private XElement GetSheet(string sheetId)
         {
-            return GetSheets().Where(w => GetAttribValue(w, "id") == sheetId).FirstOrDefault();
+            return GetSheets()
+                .Where(w => GetAttribValue(w, "id") == sheetId)
+                .FirstOrDefault();
         }
 
         private List<XElement> GetSheets()
         {
-            return _contentData.Root.Elements().Where(w => w.Name.ToString().EndsWith("sheet")).ToList();
+            return _contentData.Root.Elements()
+                .Where(w => w.Name.ToString()
+                .EndsWith("sheet"))
+                .ToList();
         }
 
         private XElement GetTopic(string topicId)
@@ -642,7 +647,9 @@ namespace XMindAPI
 
             foreach (XElement sheet in GetSheets())
             {
-                topic = GetTopics(sheet).Where(w => GetAttribValue(w, "id") == topicId).FirstOrDefault();
+                topic = GetTopics(sheet)
+                    .Where(w => GetAttribValue(w, "id") == topicId)
+                    .FirstOrDefault();
 
                 if (topic != null) break;
             }
@@ -652,12 +659,16 @@ namespace XMindAPI
 
         private List<XElement> GetTopics(XElement sheet)
         {
-            return sheet.Descendants().Where(w => w.Name.ToString().EndsWith("topic")).ToList();
+            return sheet.Descendants()
+                .Where(w => w.Name.ToString()
+                .EndsWith("topic"))
+                .ToList();
         }
 
         private string GetAttribValue(XElement el, string attributeName)
         {
-            XAttribute att = el.Attributes(attributeName).FirstOrDefault();
+            XAttribute att = el.Attributes(attributeName)
+                .FirstOrDefault();
 
             if (att == null)
             { return null; }

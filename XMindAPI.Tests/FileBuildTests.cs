@@ -13,10 +13,11 @@ namespace Tests
         }
 
         [Test]
-        public void Test1()
+        public void Test()
         {
             Console.WriteLine("Hello World");
-            XMindWorkBook book = new XMindWorkBook("Test");
+            // XMindWorkBook book = new XMindWorkBook("Test");
+            XMindDocumentBuilder build = new XMindDocumentBuilder();
         }
     }
 }
