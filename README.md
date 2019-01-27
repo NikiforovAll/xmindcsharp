@@ -7,11 +7,18 @@ One Paragraph of project description goes here
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ## TODO
-
+* refactor XMindWorkBook
+    * separate file adapters (add in-memory support)
+    * add configuration of all sorts
 * add logging to netstandard xmindcharp lib
     * https://stackoverflow.com/questions/2764384/logging-in-a-c-sharp-library
     * https://andrewlock.net/using-dependency-injection-in-a-net-core-console-application/
 * add appsettings file to assembly/manifest
+
+* basic set functinality:
+    * markerkers (probably already implemented)
+    * links between topic
+    * hyper-links
 
 ### Prerequisites
 
