@@ -15,9 +15,10 @@ namespace XMindAPI
             metaFile.Declaration = new XDeclaration("1.0", "UTF-8", "no");
             metaFile.Add(
                 new XElement(
-                    $"{XMindConfigurationCache.Configuration.XMindConfigCollection["metaNamespace"]}meta",
+                    XNamespace.Get(XMindConfigurationCache.Configuration.XMindConfigCollection["metaNamespace"]) + "meta",
                     new XAttribute("version", "2.0")
-                ));
+                )
+            );
             return metaFile;
         }
 
@@ -26,7 +27,7 @@ namespace XMindAPI
             var manifest = new XDocument();
             manifest.Declaration = new XDeclaration("1.0", "UTF-8", "no");
             var manifestNamespace = XMindConfigurationCache.Configuration.XMindConfigCollection["manifestNamespace"];
-            var manifestFileEntryToken = $"{manifestNamespace}file-entry";
+            var manifestFileEntryToken = XNamespace.Get(manifestNamespace) + "file-entry";
             XElement rootElement = new XElement($"{manifestNamespace}manifest");
             rootElement.Add(
                 new XElement(manifestFileEntryToken,
@@ -56,7 +57,7 @@ namespace XMindAPI
             return manifest;
         }
 
-        private XDocument CreateDefaultContentFile()
+        public XDocument CreateDefaultContentFile()
         {
             var content = new XDocument();
             IConfiguration xmindConfig = XMindConfigurationCache.Configuration.XMindConfigCollection;
@@ -66,14 +67,13 @@ namespace XMindAPI
 
             content.Add(new XElement(
                 $"{xmindConfig["contentNamespace"]}xmap-content",
-                new XAttribute($"{XNamespace.Xmlns}fo", ns2),
-                new XAttribute($"{XNamespace.Xmlns}svg", ns3),
-                new XAttribute($"{XNamespace.Xmlns}xhtml", ns4),
-                new XAttribute($"{XNamespace.Xmlns}xlink", xmindConfig["xlinkNamespace"]),
+                new XAttribute(XNamespace.Xmlns + "fo", ns2),
+                new XAttribute(XNamespace.Xmlns + "svg", ns3),
+                new XAttribute(XNamespace.Xmlns + "xhtml", ns4),
+                new XAttribute(XNamespace.Xmlns + "xlink", XNamespace.Get(xmindConfig["xlinkNamespace"])),
                 new XAttribute("version", "2.0")
             ));
             return content;
         }
-
     }
 }
