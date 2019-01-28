@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace XMindAPI
 {
@@ -19,6 +21,16 @@ namespace XMindAPI
                     new XAttribute("version", "2.0")
                 )
             );
+
+            var isLoggingOutputNeeded = XMindConfigurationCache.Configuration.XMindConfigCollection["FileOutPut:LogFileOutPutCondition"];
+            if(bool.TryParse(isLoggingOutputNeeded, out var isLoggingNeeded) && isLoggingNeeded)
+            {
+                using (StringWriter sw = new StringWriter())
+                {
+                    metaFile.Save(sw);
+                    Log.Information($"metaFile: {Environment.NewLine} {sw.ToString()}");
+                }
+            }
             return metaFile;
         }
 

@@ -15,6 +15,8 @@ These instructions will get you a copy of the project up and running on your loc
     * https://andrewlock.net/using-dependency-injection-in-a-net-core-console-application/
 * add appsettings file to assembly/manifest
 
+* add Travis support
+* add guide for conventional commits and probably automate stuff around that approach.
 * basic set functinality:
     * markerkers (probably already implemented)
     * links between topic
@@ -59,6 +61,7 @@ Add additional notes about how to deploy this on a live system
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
+We use Conventional Commits: https://www.conventionalcommits.org/en/v1.0.0-beta.2/#specification
 ## Authors
 
 * **Alexey Nikiforov** - *Initial work*  [NikiforovAll](https://github.com/NikiforovAll)

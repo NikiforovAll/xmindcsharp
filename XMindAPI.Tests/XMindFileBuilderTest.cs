@@ -2,30 +2,37 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using XMindAPI;
+using Serilog;
+using Serilog.Sinks.TestCorrelator;
+using FluentAssertions;
 
 namespace Tests
 {
     [TestFixture]
     public class XMindDocumentBuilderTest
     {
-        internal XMindDocumentBuilder Builder { get; set; }
-
         [SetUp]
         public void Setup()
         {
-            Builder = new XMindDocumentBuilder();
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Sink(new TestCorrelatorSink())
+                .WriteTo.File("log.txt")
+                .CreateLogger();
         }
 
         [Test]
         public void CreateDefaultMetaFile_DefaultCreate_Success()
         {
-            XMindDocumentBuilder build = new XMindDocumentBuilder();
-            var doc = build.CreateDefaultMetaFile();
-            using (StringWriter sw = new StringWriter())
+
+            using (TestCorrelator.CreateContext())
             {
-                doc.Save(sw);
-                TestContext.WriteLine($"doc: {sw.ToString()}");
+                XMindDocumentBuilder build = new XMindDocumentBuilder();
+                var doc = build.CreateDefaultMetaFile();
+                TestCorrelator.GetLogEventsFromCurrentContext()
+                    .Should().ContainSingle();
+                
             }
         }
     }
-}
+}   

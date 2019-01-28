@@ -18,6 +18,8 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+		<PackageReference Include="serilog" Version="2.8.0" />
+		<PackageReference Include="serilog.sinks.console" Version="3.1.1" />
 	</ItemGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>
@@ -28,6 +30,6 @@
 		</DocumentationFile>
 	</PropertyGroup>
   <ItemGroup>
-    <None Include ="$(ProjectDir)xmindsettings.json"  CopyToOutputDirectory="PreserveNewest"  />
+    <None Include="$(ProjectDir)xmindsettings.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

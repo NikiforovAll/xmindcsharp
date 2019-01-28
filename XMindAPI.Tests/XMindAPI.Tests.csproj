@@ -7,9 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.6.0" />
     <PackageReference Include="nunit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="serilog" Version="2.8.0" />
+    <PackageReference Include="serilog.sinks.file" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.TestCorrelator" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
