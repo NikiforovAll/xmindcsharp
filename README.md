@@ -14,8 +14,8 @@ These instructions will get you a copy of the project up and running on your loc
     * https://stackoverflow.com/questions/2764384/logging-in-a-c-sharp-library
     * https://andrewlock.net/using-dependency-injection-in-a-net-core-console-application/
 * add appsettings file to assembly/manifest
-
-* add Travis support
+* add LoggerWriter and FileWriter to project as output options
+* add Travis/Appveyor support
 * add guide for conventional commits and probably automate stuff around that approach.
 * basic set functinality:
     * markerkers (probably already implemented)
