@@ -48,7 +48,7 @@ namespace Tests
         [Test]
         public void Save_CreateEmptyBookWithFileLogger_Success()
         {
-                       var book = new XMindConfiguration()
+            var book = new XMindConfiguration()
                 .WriteTo
                 .Writer(new LoggerWriter()
                         .SetOutputName(new LoggerWriterOutput("root")))
