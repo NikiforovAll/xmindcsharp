@@ -1,6 +1,6 @@
 using System.IO;
 using XMindAPI;
-using Serilog;
+
 namespace XMindAPI.Writers
 {
     public class LoggerWriter : IXMindWriter
@@ -27,7 +27,7 @@ namespace XMindAPI.Writers
             // https://stackoverflow.com/questions/750198/convert-xdocument-to-stream/11672647
             using (StreamWriter sw = new StreamWriter(stream))
             {
-                Log.Information(sw.ToString());
+                // Log.Information(sw.ToString());
             }
         }
     }

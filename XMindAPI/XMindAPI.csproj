@@ -1,25 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
+		<RootNamespace>XMindAPI</RootNamespace>
 	</PropertyGroup>
+
 	<ItemGroup>
-		<!-- TODO: Check that previous references are unnecessary -->
-		<!--
-		<Reference Include="System" />
-		<Reference Include="System.Core" />
-		<Reference Include="System.Xml.Linq" />
-		<Reference Include="System.Data.DataSetExtensions" />
-		<Reference Include="Microsoft.CSharp" />
-		<Reference Include="System.Data" />
-		<Reference Include="System.Xml" />
-		-->
-	</ItemGroup>
-	<ItemGroup>
+		<PackageReference Include="liblog" Version="5.0.5">
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		  <PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-		<PackageReference Include="serilog" Version="2.8.0" />
-		<PackageReference Include="serilog.sinks.console" Version="3.1.1" />
 	</ItemGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>

@@ -2,12 +2,13 @@ using System;
 using System.IO;
 using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
-using Serilog;
+using XMindAPI.Logging;
 
 namespace XMindAPI
 {
     internal class XMindDocumentBuilder
     {
+         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         public XMindDocumentBuilder()
         {
         }
@@ -22,13 +23,14 @@ namespace XMindAPI
                 )
             );
 
+            //TODO: make this depend on project output verbosity level
             var isLoggingOutputNeeded = XMindConfigurationCache.Configuration.XMindConfigCollection["FileOutPut:LogFileOutPutCondition"];
             if(bool.TryParse(isLoggingOutputNeeded, out var isLoggingNeeded) && isLoggingNeeded)
             {
                 using (StringWriter sw = new StringWriter())
                 {
                     metaFile.Save(sw);
-                    Log.Information($"metaFile: {Environment.NewLine} {sw.ToString()}");
+                    Logger.Info($"metaFile: {Environment.NewLine} {sw.ToString()}");
                 }
             }
             return metaFile;
