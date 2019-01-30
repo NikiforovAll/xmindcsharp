@@ -10,17 +10,15 @@ These instructions will get you a copy of the project up and running on your loc
 * refactor XMindWorkBook
     * separate file adapters (add in-memory support)
     * add configuration of all sorts
-* add logging to netstandard xmindcharp lib
-    * https://stackoverflow.com/questions/2764384/logging-in-a-c-sharp-library
-    * https://andrewlock.net/using-dependency-injection-in-a-net-core-console-application/
-* add appsettings file to assembly/manifest
-* add LoggerWriter and FileWriter to project as output options
-* add Travis/Appveyor support
-* add guide for conventional commits and probably automate stuff around that approach.
 * basic set functinality:
     * markerkers (probably already implemented)
     * links between topic
     * hyper-links
+* add appsettings file to assembly/manifest
+* add LoggerWriter and FileWriter to project as output options
+* add Travis/Appveyor support
+* add guide for conventional commits and probably automate stuff around that approach.
+* write .xmind to XDocument converter
 
 ### Prerequisites
 

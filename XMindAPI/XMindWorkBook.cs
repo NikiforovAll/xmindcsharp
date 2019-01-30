@@ -6,6 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.IO.Compression;
+using System.Collections.Generic;
+
+using XMindAPI.Configuration;
+using XMindAPI.Writers;
 
 namespace XMindAPI
 {
@@ -14,9 +18,8 @@ namespace XMindAPI
     /// </summary>
     public class XMindWorkBook
     {
-        #region Private properties
-
         private string _fileName = null;
+        private readonly XMindConfiguration _globalConfiguration;
         private XDocument _manifestData = null;
         private XDocument _metaData = null;
         private XDocument _contentData = null;
@@ -25,49 +28,29 @@ namespace XMindAPI
         private XNamespace _defaultMetaNS = null;
         private XNamespace _xlinkNS = null;
 
-        #endregion  // Private properties
-
-        #region CTOR
-
-        /// <summary>
-        /// Creates a new XMind workbook. If the workbook exists it will be overwritten with a new empty workbook.
-        /// </summary>
-        /// <param name="fileName">XMind workbook file to create</param>
-        public XMindWorkBook(string fileName) : this(fileName, false)
-        {
-        }
 
         /// <summary>
         /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
         /// </summary>
         /// <param name="fileName">XMind file to create / load</param>
         /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
-        public XMindWorkBook(string fileName, bool loadContent)
+        internal XMindWorkBook(string fileName, bool loadContent, XMindConfiguration globalConfiguration)
         {
             _fileName = fileName;
-
-            _defaultContentNS = XNamespace.Get("urn:xmind:xmap:xmlns:content:2.0");
-            _defaultManifestNS = XNamespace.Get("urn:xmind:xmap:xmlns:manifest:1.0");
-            _defaultMetaNS = XNamespace.Get("urn:xmind:xmap:xmlns:meta:2.0");
-            _xlinkNS = XNamespace.Get("http://www.w3.org/1999/xlink");
-
+            this._globalConfiguration = globalConfiguration;
             if (loadContent)
             {
                 Load();
             }
             else
             {
-                CreateDefaultMetaFile();
-                CreateDefaultManifestFile();
-                CreateDefaultContentFile();
+                var builder = new XMindDocumentBuilder();
+                _metaData = builder.CreateDefaultMetaFile();
+                _manifestData = builder.CreateDefaultManifestFile();
+                _contentData = builder.CreateDefaultContentFile();
+
             }
         }
-
-        #endregion
-
-        #region Public members
-
-        #region Sheet processing
 
         public List<XMindSheet> GetSheetInfo()
         {
@@ -140,11 +123,6 @@ namespace XMindAPI
 
             return sheetsFound;
         }
-
-        #endregion  // Sheet processing
-
-        #region Topic processing
-
         /// <summary>
         /// Add a new central topic to the specified sheet. A sheet must have one (and only one) central topic.
         /// </summary>
@@ -480,10 +458,6 @@ namespace XMindAPI
             return topicsFound;
         }
 
-        #endregion  // Topic processing
-
-        #region Generic processing
-
         /// <summary>
         /// Add a user tag to the specified sheet or topic.
         /// </summary>
@@ -577,34 +551,47 @@ namespace XMindAPI
         /// </summary>
         public void Save()
         {
-            if (_fileName == null)
-            { throw new InvalidOperationException("Nothing to save!"); }
+            var currentWriter = _globalConfiguration.WriteTo.MainWriter;
+            var metaFileName = "meta.xml";
+            var manifestFileName = "manifest.xml";
+            var contentFileName = "content.xml";
 
-            String tempPath = Path.GetTempPath() + Guid.NewGuid() + "\\";
-
-            Directory.CreateDirectory(tempPath);
-            Directory.CreateDirectory(tempPath + "META-INF");
-            Directory.CreateDirectory(tempPath + "Thumbnails");
-
-            File.WriteAllText(tempPath + "META-INF\\manifest.xml", _manifestData.ToString());
-            File.WriteAllText(tempPath + "meta.xml", _metaData.ToString());
-            File.WriteAllText(tempPath + "content.xml", _contentData.ToString());
-
-            using (ZipStorer zip = ZipStorer.Create(_fileName, string.Empty))
+            var files = new Dictionary<string, XDocument>(3)
             {
-                zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "META-INF\\manifest.xml", "manifest.xml", string.Empty);
-                zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "meta.xml", "meta.xml", string.Empty);
-                zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "content.xml", "content.xml", string.Empty);
-            }
+                [metaFileName] = _metaData,
+                [manifestFileName] = _manifestData,
+                [contentFileName] = _contentData
+            };
 
-            Directory.Delete(tempPath, true);
+            foreach (var kvp in files)
+            {
+                currentWriter.WriteToStorage(kvp.Value, kvp.Key);
+            }
+            _globalConfiguration.WriteTo.FinalizeAction?.Invoke(new XMindWriterContext() { FileEntries = files.Values });
+
+            // if (_fileName == null)
+            // { throw new InvalidOperationException("Nothing to save!"); }
+
+            // String tempPath = Path.GetTempPath() + Guid.NewGuid() + "\\";
+
+            // Directory.CreateDirectory(tempPath);
+            // Directory.CreateDirectory(tempPath + "META-INF");
+            // Directory.CreateDirectory(tempPath + "Thumbnails");
+
+            // File.WriteAllText(tempPath + "META-INF\\manifest.xml", _manifestData.ToString());
+            // File.WriteAllText(tempPath + "meta.xml", _metaData.ToString());
+            // File.WriteAllText(tempPath + "content.xml", _contentData.ToString());
+
+            // using (ZipStorer zip = ZipStorer.Create(_fileName, string.Empty))
+            // {
+            //     zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "META-INF\\manifest.xml", "manifest.xml", string.Empty);
+            //     zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "meta.xml", "meta.xml", string.Empty);
+            //     zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "content.xml", "content.xml", string.Empty);
+            // }
+
+            // Directory.Delete(tempPath, true);
         }
 
-        #endregion  // Generic processing
-
-        #endregion  // Public members
-
-        #region Private members
 
         /// <summary>
         /// Helper method to build nested topic structure used by public method GetSheetInfo().
@@ -686,69 +673,6 @@ namespace XMindAPI
             return DateTime.UtcNow.Ticks.ToString();
         }
 
-        private void CreateDefaultMetaFile()
-        {
-            _metaData = new XDocument();
-            
-            _metaData.Declaration = new XDeclaration("1.0", "UTF-8", "no");
-
-            _metaData.Add(
-                new XElement(_defaultMetaNS + "meta",
-                                new XAttribute("version", "2.0")));
-        }
-
-        private void CreateDefaultManifestFile()
-        {
-            _manifestData = new XDocument();
-
-            _manifestData.Declaration = new XDeclaration("1.0", "UTF-8", "no");
-
-            XElement rootEle = new XElement(_defaultManifestNS + "manifest");
-
-            rootEle.Add(
-                new XElement(_defaultManifestNS + "file-entry",
-                    new XAttribute("full-path", "content.xml"),
-                    new XAttribute("media-type", "text/xml")
-                ));
-
-            rootEle.Add(
-                new XElement(_defaultManifestNS + "file-entry",
-                    new XAttribute("full-path", "META-INF/"),
-                    new XAttribute("media-type", "")
-                ));
-
-            rootEle.Add(
-                new XElement(_defaultManifestNS + "file-entry",
-                    new XAttribute("full-path", "META-INF/manifest.xml"),
-                    new XAttribute("media-type", "text/xml")
-                ));
-
-            rootEle.Add(
-                new XElement(_defaultManifestNS + "file-entry",
-                    new XAttribute("full-path", "Thumbnails/"),
-                    new XAttribute("media-type", "")
-                ));
-
-            _manifestData.Add(rootEle);
-        }
-
-        private void CreateDefaultContentFile()
-        {
-            _contentData = new XDocument();
-
-            XNamespace ns2 = XNamespace.Get("http://www.w3.org/1999/XSL/Format");
-            XNamespace ns3 = XNamespace.Get("http://www.w3.org/2000/svg");
-            XNamespace ns4 = XNamespace.Get("http://www.w3.org/1999/xhtml");
-
-            _contentData.Add(new XElement(_defaultContentNS + "xmap-content",
-                new XAttribute(XNamespace.Xmlns + "fo", ns2),
-                new XAttribute(XNamespace.Xmlns + "svg", ns3),
-                new XAttribute(XNamespace.Xmlns + "xhtml", ns4),
-                new XAttribute(XNamespace.Xmlns + "xlink", _xlinkNS),
-                new XAttribute("version", "2.0")
-                ));
-        }
-
         /// <summary>
         /// Loads an XMind workbook file from disk.
         /// </summary>
@@ -761,7 +685,7 @@ namespace XMindAPI
             { throw new InvalidOperationException("XMind file does not exist!"); }
 
             FileInfo xMindFileInfo = new FileInfo(_fileName);
-          
+
             if (xMindFileInfo.Extension.ToLower() != ".xmind")
             { throw new InvalidOperationException("XMind file extension expected!"); }
 
@@ -769,7 +693,7 @@ namespace XMindAPI
             Directory.CreateDirectory(tempPath);
 
             string[] fileNameStrings = xMindFileInfo.Name.Split('.');
-            fileNameStrings[fileNameStrings.Count() - 1] = "zip"; 
+            fileNameStrings[fileNameStrings.Count() - 1] = "zip";
 
             StringBuilder zipFileNameBuilder = new StringBuilder(string.Empty, 64);
             foreach (string str in fileNameStrings)
@@ -803,6 +727,5 @@ namespace XMindAPI
             Directory.Delete(tempPath, true);
         }
 
-        #endregion  // Private members
     }
 }

@@ -44,7 +44,7 @@ namespace XMindAPI
                 }
                 XMindConfigCollection = builder.Build();
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
                 // TODO: remove and add proper exception handling
                 throw;

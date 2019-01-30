@@ -1,34 +1,34 @@
 using System.IO;
+using System.Xml.Linq;
 using XMindAPI;
+using XMindAPI.Logging;
 
 namespace XMindAPI.Writers
 {
     public class LoggerWriter : IXMindWriter
     {
+         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+        
         private IXMindWriterOutput _output;
 
-        public LoggerWriter():this(new LoggerWriterOutput("root", XMindAPI.XMindOutputType.Log))
+        public LoggerWriter():this(new FileWriterOutput("root"))
         {
-            
         }
 
         public LoggerWriter(IXMindWriterOutput output)
         {
-            this._output = output;
+            SetOutputName(output);
         }
-        public void SetOutputName(IXMindWriterOutput output)
+        public IXMindWriter SetOutputName(IXMindWriterOutput output)
         {
-            throw new System.NotImplementedException();
+            _output = output;
+            return this;
         }
 
-        public void WriteToStorage(Stream stream)
+        public void WriteToStorage(XDocument document, string file)
         {
-            //TODO: check - Convert XDocument to MemoryStream
-            // https://stackoverflow.com/questions/750198/convert-xdocument-to-stream/11672647
-            using (StreamWriter sw = new StreamWriter(stream))
-            {
-                // Log.Information(sw.ToString());
-            }
+            Logger.Info(
+                $"IXMindWriter<LoggerWriter>, OutputName: {_output.OutputName}{System.Environment.NewLine} fileName {file} {System.Environment.NewLine}{document.ToString()}");
         }
     }
 }

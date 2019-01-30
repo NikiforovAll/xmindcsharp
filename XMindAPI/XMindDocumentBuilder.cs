@@ -22,17 +22,15 @@ namespace XMindAPI
                     new XAttribute("version", "2.0")
                 )
             );
-
-            //TODO: make this depend on project output verbosity level
-            var isLoggingOutputNeeded = XMindConfigurationCache.Configuration.XMindConfigCollection["FileOutPut:LogFileOutPutCondition"];
-            if(bool.TryParse(isLoggingOutputNeeded, out var isLoggingNeeded) && isLoggingNeeded)
-            {
-                using (StringWriter sw = new StringWriter())
-                {
-                    metaFile.Save(sw);
-                    Logger.Info($"metaFile: {Environment.NewLine} {sw.ToString()}");
-                }
-            }
+            // var isLoggingOutputNeeded = XMindConfigurationCache.Configuration.XMindConfigCollection["FileOutPut:LogFileOutPutCondition"];
+            // if(bool.TryParse(isLoggingOutputNeeded, out var isLoggingNeeded) && isLoggingNeeded)
+            // {
+            //     using (StringWriter sw = new StringWriter())
+            //     {
+            //         metaFile.Save(sw);
+            //         Logger.Info($"metaFile: {Environment.NewLine} {sw.ToString()}");
+            //     }
+            // }
             return metaFile;
         }
 
@@ -40,9 +38,9 @@ namespace XMindAPI
         {
             var manifest = new XDocument();
             manifest.Declaration = new XDeclaration("1.0", "UTF-8", "no");
-            var manifestNamespace = XMindConfigurationCache.Configuration.XMindConfigCollection["manifestNamespace"];
-            var manifestFileEntryToken = XNamespace.Get(manifestNamespace) + "file-entry";
-            XElement rootElement = new XElement($"{manifestNamespace}manifest");
+            var manifestNamespace = XNamespace.Get(XMindConfigurationCache.Configuration.XMindConfigCollection["manifestNamespace"]);
+            var manifestFileEntryToken = manifestNamespace + "file-entry";
+            XElement rootElement = new XElement(manifestNamespace + "manifest");
             rootElement.Add(
                 new XElement(manifestFileEntryToken,
                     new XAttribute("full-path", "content.xml"),
@@ -80,7 +78,7 @@ namespace XMindAPI
             XNamespace ns4 = XNamespace.Get(xmindConfig["standardContentNamespaces:xhtml"]);
 
             content.Add(new XElement(
-                $"{xmindConfig["contentNamespace"]}xmap-content",
+                XNamespace.Get(xmindConfig["contentNamespace"]) + "xmap-content",
                 new XAttribute(XNamespace.Xmlns + "fo", ns2),
                 new XAttribute(XNamespace.Xmlns + "svg", ns3),
                 new XAttribute(XNamespace.Xmlns + "xhtml", ns4),
