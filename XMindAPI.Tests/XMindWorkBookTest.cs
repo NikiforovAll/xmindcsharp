@@ -9,6 +9,7 @@ using Serilog;
 using Serilog.Sinks.TestCorrelator;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
+using System.Collections.Generic;
 
 namespace Tests
 {
@@ -26,33 +27,54 @@ namespace Tests
         }
 
         [Test]
-        public void Save_CreateEmptyBook_Success()
+        public void Save_CreateEmptyBookWithLogger_Success()
         {
            var book = new XMindConfiguration()
                 .WriteTo
                 .SetFinalizeAction(context => Log.Logger.Information("Finalized"))
                 .Writer(new LoggerWriter()
-                        .SetOutputName(new LoggerWriterOutput("root")))
+                        .SetOutput(new LoggerWriterOutputConfig("root")))
                 .CreateWorkBook("test");
             using (TestCorrelator.CreateContext())
             {
                 book.Save();
-                TestCorrelator.GetLogEventsFromCurrentContext().Should()
+                TestCorrelator.GetLogEventsFromCurrentContext()
+                .Where(e => e.Level == Serilog.Events.LogEventLevel.Information)
+                .Should()
                 .HaveCount(4, "empty book initialization had failed");
+
                 TestCorrelator.GetLogEventsFromCurrentContext()
                     .Where(e => !e.MessageTemplate.ToString().Contains("Finalized", StringComparison.OrdinalIgnoreCase))
-                    .All(e => e.MessageTemplate.ToString().Contains("root")).Should().BeTrue();
+                    .Any(e => e.MessageTemplate.ToString().Contains("root")).Should().BeTrue();
             }
         }
 
         [Test]
-        public void Save_CreateEmptyBookWithFileLogger_Success()
+        public void Save_CreateEmptyBookWithFileWriter_Success()
         {
             var book = new XMindConfiguration()
-                .WriteTo
-                .Writer(new LoggerWriter()
-                        .SetOutputName(new LoggerWriterOutput("root")))
+                .WriteTo.Writers(
+                    new List<IXMindWriter>{
+                        new FileWriter().SetOutput(new FileWriterOutputConfig("manifest.xml").SetBasePath("output/META-INF")),
+                        new FileWriter().SetOutput(new FileWriterOutputConfig("root.xml").SetBasePath("output/"))
+                    })
+                .WriteTo.SetWriterBinding(
+                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{ResolveManifestFile, ResolveOtherFiles}
+                )
                 .CreateWorkBook("test");
+            book.Save();
+        }
+
+        //TODO: fix bug !!
+        private IXMindWriter ResolveManifestFile(XMindWriterContext context, List<IXMindWriter> writers)
+        {
+            var file = "manifest.xml";
+            return writers.Where(w => context.FileName.Equals(file) && w.GetOutputConfig().OutputName.Equals(file)).FirstOrDefault();
+        }
+        private IXMindWriter ResolveOtherFiles(XMindWriterContext context, List<IXMindWriter> writers)
+        {
+             var file = "manifest.xml";
+            return writers.Where(w => !context.FileName.Equals(file) || !w.GetOutputConfig().OutputName.Equals(file)).FirstOrDefault();
         }
     }
 }   

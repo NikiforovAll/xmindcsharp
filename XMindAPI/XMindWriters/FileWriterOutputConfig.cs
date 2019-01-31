@@ -1,17 +1,17 @@
 namespace XMindAPI.Writers
 {
-    public class FileWriterOutput : IXMindWriterOutput
+    public class FileWriterOutputConfig : IXMindWriterOutputConfig
     {
         private string _path;
         public string OutputName { get; set; }
         public string Path { get => _path; private set => _path = value; }
 
-        public FileWriterOutput(string outputName)
+        public FileWriterOutputConfig(string outputName)
         {
             OutputName = outputName;
         }
 
-        public IXMindWriterOutput SetBasePath(string path)
+        public IXMindWriterOutputConfig SetBasePath(string path)
         {
             Path = path;
             return this;

@@ -1,6 +1,6 @@
 namespace XMindAPI
 {
-    public interface IXMindWriterOutput
+    public interface IXMindWriterOutputConfig
     {
         string OutputName { get; set;}
     }

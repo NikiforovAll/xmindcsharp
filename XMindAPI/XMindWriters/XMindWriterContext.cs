@@ -6,5 +6,7 @@ namespace XMindAPI.Writers
     public class XMindWriterContext
     {
         public IEnumerable<XDocument> FileEntries { get; set; }
+        
+        public string FileName { get; set; }
     }
 }

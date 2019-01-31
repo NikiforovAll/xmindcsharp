@@ -553,7 +553,6 @@ namespace XMindAPI
         /// </summary>
         public void Save()
         {
-            var currentWriter = _globalConfiguration.WriteTo.MainWriter;
             var manifestFileName = _xMindSettings.XMindConfigCollection["output:manifest"];
             var metaFileName = _xMindSettings.XMindConfigCollection["output:metadata"];
             var contentFileName = _xMindSettings.XMindConfigCollection["output:content"];;
@@ -565,11 +564,20 @@ namespace XMindAPI
                 [contentFileName] = _contentData
             };
 
+            var writerContexts = new List<XMindWriterContext>();
             foreach (var kvp in files)
             {
-                currentWriter.WriteToStorage(kvp.Value, kvp.Key);
+                var currentWriterContext = new XMindWriterContext(){
+                    FileName = kvp.Key,
+                    FileEntries = new XDocument[1]{kvp.Value}
+                };
+                _globalConfiguration
+                    .WriteTo
+                    .ResolveWriter(currentWriterContext)
+                    .WriteToStorage(kvp.Value, kvp.Key);
+                writerContexts.Add(currentWriterContext);
             }
-            _globalConfiguration.WriteTo.FinalizeAction?.Invoke(new XMindWriterContext() { FileEntries = files.Values });
+            _globalConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts);
 
             // if (_fileName == null)
             // { throw new InvalidOperationException("Nothing to save!"); }

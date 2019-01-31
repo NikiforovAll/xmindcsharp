@@ -7,28 +7,36 @@ namespace XMindAPI.Writers
 {
     public class LoggerWriter : IXMindWriter
     {
-         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
-        
-        private IXMindWriterOutput _output;
+        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
-        public LoggerWriter():this(new FileWriterOutput("root"))
+        private IXMindWriterOutputConfig _output;
+
+        public LoggerWriter() : this(new FileWriterOutputConfig("root"))
         {
         }
 
-        public LoggerWriter(IXMindWriterOutput output)
+        public LoggerWriter(IXMindWriterOutputConfig output)
         {
-            SetOutputName(output);
+            SetOutput(output);
         }
-        public IXMindWriter SetOutputName(IXMindWriterOutput output)
+
+        public IXMindWriterOutputConfig Output { get => _output; set => _output = value; }
+
+        public IXMindWriter SetOutput(IXMindWriterOutputConfig output)
         {
-            _output = output;
+            Output = output;
             return this;
         }
 
         public void WriteToStorage(XDocument document, string file)
         {
             Logger.Info(
-                $"IXMindWriter<LoggerWriter>, OutputName: {_output.OutputName}{System.Environment.NewLine} fileName {file} {System.Environment.NewLine}{document.ToString()}");
+                $"IXMindWriter<LoggerWriter>, OutputName: {Output.OutputName}{System.Environment.NewLine} fileName {file} {System.Environment.NewLine}{document.ToString()}");
+        }
+
+        public IXMindWriterOutputConfig GetOutputConfig()
+        {
+            return _output;
         }
     }
 }

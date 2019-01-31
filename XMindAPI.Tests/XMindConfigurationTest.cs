@@ -22,7 +22,7 @@ namespace Tests
             var config = new XMindConfiguration()
                 .WriteTo
                 .Writer(new LoggerWriter()
-                        .SetOutputName(new LoggerWriterOutput("root")));
+                        .SetOutput(new LoggerWriterOutputConfig("root")));
            
         }
     }

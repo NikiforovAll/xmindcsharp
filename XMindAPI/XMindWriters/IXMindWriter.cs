@@ -5,6 +5,7 @@ namespace XMindAPI.Writers
     public interface IXMindWriter
     {
         void WriteToStorage(XDocument document, string fileName);
-        IXMindWriter SetOutputName(IXMindWriterOutput output);
+        IXMindWriter SetOutput(IXMindWriterOutputConfig output);
+        IXMindWriterOutputConfig GetOutputConfig();
     }
 }
