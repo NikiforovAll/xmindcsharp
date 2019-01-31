@@ -28,15 +28,17 @@ namespace XMindAPI
         private XNamespace _defaultMetaNS = null;
         private XNamespace _xlinkNS = null;
 
+        internal readonly XMindConfigurationCache _xMindSettings;
 
         /// <summary>
         /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
         /// </summary>
         /// <param name="fileName">XMind file to create / load</param>
         /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
-        internal XMindWorkBook(string fileName, bool loadContent, XMindConfiguration globalConfiguration)
+        internal XMindWorkBook(string fileName, bool loadContent, XMindConfiguration globalConfiguration, XMindConfigurationCache config)
         {
             _fileName = fileName;
+            _xMindSettings = config;
             this._globalConfiguration = globalConfiguration;
             if (loadContent)
             {
@@ -552,9 +554,9 @@ namespace XMindAPI
         public void Save()
         {
             var currentWriter = _globalConfiguration.WriteTo.MainWriter;
-            var metaFileName = "meta.xml";
-            var manifestFileName = "manifest.xml";
-            var contentFileName = "content.xml";
+            var manifestFileName = _xMindSettings.XMindConfigCollection["output:manifest"];
+            var metaFileName = _xMindSettings.XMindConfigCollection["output:metadata"];
+            var contentFileName = _xMindSettings.XMindConfigCollection["output:content"];;
 
             var files = new Dictionary<string, XDocument>(3)
             {

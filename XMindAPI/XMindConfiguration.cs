@@ -17,7 +17,7 @@ namespace XMindAPI.Configuration
 
         public XMindWorkBook CreateWorkBook(string fileName, bool loadContent)
         {
-            return new XMindWorkBook(fileName, loadContent, this);
+            return new XMindWorkBook(fileName, loadContent, this, XMindConfigurationCache.Configuration);
         }
 
         public XMindWorkBook CreateWorkBook(string fileName)

@@ -22,15 +22,6 @@ namespace XMindAPI
                     new XAttribute("version", "2.0")
                 )
             );
-            // var isLoggingOutputNeeded = XMindConfigurationCache.Configuration.XMindConfigCollection["FileOutPut:LogFileOutPutCondition"];
-            // if(bool.TryParse(isLoggingOutputNeeded, out var isLoggingNeeded) && isLoggingNeeded)
-            // {
-            //     using (StringWriter sw = new StringWriter())
-            //     {
-            //         metaFile.Save(sw);
-            //         Logger.Info($"metaFile: {Environment.NewLine} {sw.ToString()}");
-            //     }
-            // }
             return metaFile;
         }
 

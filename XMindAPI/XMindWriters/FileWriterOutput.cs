@@ -4,6 +4,7 @@ namespace XMindAPI.Writers
     {
         private string _path;
         public string OutputName { get; set; }
+        public string Path { get => _path; private set => _path = value; }
 
         public FileWriterOutput(string outputName)
         {
@@ -12,7 +13,7 @@ namespace XMindAPI.Writers
 
         public IXMindWriterOutput SetBasePath(string path)
         {
-            _path = path;
+            Path = path;
             return this;
         }
     }

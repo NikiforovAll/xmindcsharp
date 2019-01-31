@@ -19,9 +19,10 @@ These instructions will get you a copy of the project up and running on your loc
 * add Travis/Appveyor support
 * add guide for conventional commits and probably automate stuff around that approach.
 * write .xmind to XDocument converter
-* write in memory writer
 * unit test file writer 
     * https://stackoverflow.com/questions/1528134/unit-testing-file-i-o
+* Test for inmemory writer
+* add file support for multiple output in project in order to organize file writer based on context variables (e.g. filenames)
 
 ### Prerequisites
 
