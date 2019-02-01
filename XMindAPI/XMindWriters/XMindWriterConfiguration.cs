@@ -56,13 +56,13 @@ namespace XMindAPI.Writers.Configuration
                 if(_writers != null && _writers.Any()){
                     Logger.WarnFormat("XMindConfiguration.ResolveWriter: default writer is assigned");
                     return _writers[0];
-                    
                 }else
                 {
                     throw new InvalidOperationException("XMindConfiguration.ResolveWriter: Writer is not specified");
                 }
             } 
-            return _criteria.Select(el => el.Invoke(context, _writers)).First();
+            var writerFound = _criteria.Select(w => w.Invoke(context, _writers)).Where(w => w != null).FirstOrDefault();
+            return writerFound;
         }
 
     }

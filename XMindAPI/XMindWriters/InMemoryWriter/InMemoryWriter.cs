@@ -15,10 +15,6 @@ namespace XMindAPI.Writers
 
         public Dictionary<string, XDocument> DocumentStorage { get => _documentStorage; private set => _documentStorage = value; }
 
-        public InMemoryWriter() : this(new FileWriterOutputConfig("root"))
-        {
-        }
-
         public InMemoryWriter(IXMindWriterOutputConfig output)
         {
             SetOutput(output);

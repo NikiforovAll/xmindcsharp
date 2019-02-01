@@ -3,8 +3,8 @@ using System;
 using System.IO;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
-using FluentAssertions;
 using XMindAPI;
+using FluentAssertions;
 
 namespace Tests
 {
@@ -14,6 +14,11 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
+            // Log.Logger = new LoggerConfiguration()
+            //     .MinimumLevel.Debug()
+            //     .WriteTo.Sink(new TestCorrelatorSink())
+            //     .WriteTo.File("log.txt")
+            //     .CreateLogger();
         }
 
         [Test]

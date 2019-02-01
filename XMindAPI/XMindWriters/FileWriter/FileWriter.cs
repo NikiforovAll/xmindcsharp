@@ -43,21 +43,19 @@ namespace XMindAPI.Writers
             {
                 throw new InvalidOperationException();
             }
-            File.WriteAllText(Path.Combine((_output as FileWriterOutputConfig).Path, file), document.ToString());
+            var basePath = (_output as FileWriterOutputConfig).Path;
+            Directory.CreateDirectory(basePath);
+            File.WriteAllText(Path.Combine(basePath, file), document.ToString());
         }
 
         public IXMindWriterOutputConfig GetOutputConfig()
         {
+            //use this validation logic across all writers, refactor code
+            if(_output == null || String.IsNullOrEmpty(_output.OutputName))
+            {
+                throw new InvalidOperationException("IXMindWriter: output is not configured");
+            }
             return _output;
         }
-
-        // private void ReadSettingsFromConfiguration()
-        // {
-        //     Settings = new FileWriterSettings(){
-        //         ManifestLocation = _xMindSettings["output:manifestLocation"],
-        //         MetaDataLocation = _xMindSettings["output:metadataLocation"],
-        //         ContentLocation = _xMindSettings["output:contentLocation"]
-        //     };
-        // }
     }
 }

@@ -1,16 +1,16 @@
 using NUnit.Framework;
 using System;
 using System.IO;
-using XMindAPI;
-using FluentAssertions;
 using System.Xml.Linq;
 using System.Linq;
+using System.Collections.Generic;
 using Serilog;
 using Serilog.Sinks.TestCorrelator;
+using XMindAPI;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
-using System.Collections.Generic;
-
+using XMindAPI.Writers.Util;
+using FluentAssertions;
 namespace Tests
 {
     [TestFixture]
@@ -22,7 +22,7 @@ namespace Tests
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Sink(new TestCorrelatorSink())
-                .WriteTo.File("log.txt")
+                .WriteTo.File("{Date}.log", retainedFileCountLimit: 3)
                 .CreateLogger();
         }
 
@@ -50,31 +50,45 @@ namespace Tests
         }
 
         [Test]
-        public void Save_CreateEmptyBookWithFileWriter_Success()
+        public void Save_CreateEmptyBookWithFileWriterInCaseOfCustomBasePath_Success()
         {
             var book = new XMindConfiguration()
                 .WriteTo.Writers(
                     new List<IXMindWriter>{
-                        new FileWriter().SetOutput(new FileWriterOutputConfig("manifest.xml").SetBasePath("output/META-INF")),
-                        new FileWriter().SetOutput(new FileWriterOutputConfig("root.xml").SetBasePath("output/"))
+                        new FileWriter()
+                            .SetOutput(new FileWriterOutputConfig("manifest.xml").SetBasePath("custom-output/META-INF")),
+                        new FileWriter()
+                            .SetOutput(new FileWriterOutputConfig("root.xml").SetBasePath("custom-output/"))
                     })
                 .WriteTo.SetWriterBinding(
-                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{ResolveManifestFile, ResolveOtherFiles}
+                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{
+                        FileWriterUtils.ResolveManifestFile, 
+                        FileWriterUtils.ResolveOtherFiles
+                    }
                 )
                 .CreateWorkBook("test");
             book.Save();
+            //TODO: add assertions, test IO properly, ideally it unit tests should not leave artifacts
         }
 
-        //TODO: fix bug !!
-        private IXMindWriter ResolveManifestFile(XMindWriterContext context, List<IXMindWriter> writers)
+        [Test]
+        public void Save_CreateEmptyBookWithDefaultPath_Success()
         {
-            var file = "manifest.xml";
-            return writers.Where(w => context.FileName.Equals(file) && w.GetOutputConfig().OutputName.Equals(file)).FirstOrDefault();
-        }
-        private IXMindWriter ResolveOtherFiles(XMindWriterContext context, List<IXMindWriter> writers)
-        {
-             var file = "manifest.xml";
-            return writers.Where(w => !context.FileName.Equals(file) || !w.GetOutputConfig().OutputName.Equals(file)).FirstOrDefault();
+            var book = new XMindConfiguration()
+                .WriteTo.Writers(
+                    new List<IXMindWriter>{
+                        new FileWriter().SetOutput(new FileWriterOutputConfig("manifest.xml", true)),
+                        new FileWriter().SetOutput(new FileWriterOutputConfig("default", true))
+                    })
+                .WriteTo.SetWriterBinding(
+                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{
+                        FileWriterUtils.ResolveManifestFile, 
+                        FileWriterUtils.ResolveOtherFiles
+                    }
+                )
+                .CreateWorkBook("test");
+            book.Save();
+            //TODO: add assertions, test IO properly, ideally it unit tests should not leave artifacts
         }
     }
 }   

@@ -10,11 +10,30 @@
         "xhtml": "http://www.w3.org/1999/xhtml"
     },
     "output": {
-        "manifest": "manifest.xml",
-        "metadata": "meta.xml",
-        "content": "content.xml",
-        "manifestLocation": "META-INF",
-        "metadataLocation": "",
-        "contentLocation": ""
+        "definition":{
+            "manifest": "manifest.xml",
+            "metadata": "metadata.xml",
+            "content": "content.xml",
+            "default": "default"
+        },
+        "base": "xmind-output",
+        "files": [
+            {
+                "name": "manifest.xml",
+                "location": "META-INF"
+            },
+            {
+                "name": "meta.xml",
+                "location": ""
+            },
+            {
+                "name": "content.xml",
+                "location": ""
+            },
+            {
+                "name": "default",
+                "location": ""
+            }
+        ]
     }
 }

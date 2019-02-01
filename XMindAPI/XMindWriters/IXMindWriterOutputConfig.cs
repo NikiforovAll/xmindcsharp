@@ -1,4 +1,4 @@
-namespace XMindAPI
+namespace XMindAPI.Writers
 {
     public interface IXMindWriterOutputConfig
     {

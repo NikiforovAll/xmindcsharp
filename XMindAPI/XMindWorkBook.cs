@@ -553,9 +553,10 @@ namespace XMindAPI
         /// </summary>
         public void Save()
         {
-            var manifestFileName = _xMindSettings.XMindConfigCollection["output:manifest"];
-            var metaFileName = _xMindSettings.XMindConfigCollection["output:metadata"];
-            var contentFileName = _xMindSettings.XMindConfigCollection["output:content"];;
+
+            var manifestFileName = _xMindSettings.XMindConfigCollection["output:definition:manifest"];
+            var metaFileName = _xMindSettings.XMindConfigCollection["output:definition:metadata"];
+            var contentFileName = _xMindSettings.XMindConfigCollection["output:definition:content"];;
 
             var files = new Dictionary<string, XDocument>(3)
             {
@@ -571,10 +572,14 @@ namespace XMindAPI
                     FileName = kvp.Key,
                     FileEntries = new XDocument[1]{kvp.Value}
                 };
-                _globalConfiguration
+                var selectedWriter = _globalConfiguration
                     .WriteTo
-                    .ResolveWriter(currentWriterContext)
-                    .WriteToStorage(kvp.Value, kvp.Key);
+                    .ResolveWriter(currentWriterContext);
+                if(selectedWriter == null)
+                {
+                    throw new InvalidOperationException("XMindBook.Save: Writer is not selected");
+                }
+                selectedWriter.WriteToStorage(kvp.Value, kvp.Key);
                 writerContexts.Add(currentWriterContext);
             }
             _globalConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts);

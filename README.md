@@ -15,14 +15,20 @@ These instructions will get you a copy of the project up and running on your loc
     * links between topic
     * hyper-links
 * add appsettings file to assembly/manifest
-* add LoggerWriter and FileWriter to project as output options
 * add Travis/Appveyor support
 * add guide for conventional commits and probably automate stuff around that approach.
 * write .xmind to XDocument converter
-* unit test file writer 
+* unit test file writer
     * https://stackoverflow.com/questions/1528134/unit-testing-file-i-o
-* Test for inmemory writer
-* add file support for multiple output in project in order to organize file writer based on context variables (e.g. filenames)
+* Test for in-memory writer
+* add exception handling for different cases, custom exceptions (?)
+* zip finilizer for FileWriter
+* reusable validaion logic across Writers
+    * IXMindWriterOutputConfig
+    * investigate for more
+* check that all unit tests are complete
+    * add test for inmemory writer
+* add writer resolution based on enum
 
 ### Prerequisites
 

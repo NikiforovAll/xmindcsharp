@@ -16,11 +16,11 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Sink(new TestCorrelatorSink())
-                // .WriteTo.File("log.txt")
-                .CreateLogger();
+            // Log.Logger = new LoggerConfiguration()
+            //     .MinimumLevel.Debug()
+            //     .WriteTo.Sink(new TestCorrelatorSink())
+            //     .WriteTo.File("log.txt")
+            //     .CreateLogger();
         }
 
         [Test]
