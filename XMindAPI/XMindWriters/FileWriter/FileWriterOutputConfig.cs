@@ -10,8 +10,8 @@ namespace XMindAPI.Writers
         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
         private string _path;
-        public string OutputName { get; set; }
         public string Path { get => _path; private set => _path = value; }
+        public string OutputName { get; set; }
 
         public FileWriterOutputConfig(string outputName)
         {
@@ -39,9 +39,10 @@ namespace XMindAPI.Writers
         public IXMindWriterOutputConfig SetBasePath(string path)
         {
             // TODO: probably good idea to use this logic across all IXMindWriters
-            if (!String.IsNullOrEmpty(path))
+            if (!String.IsNullOrEmpty(Path))
             {
-                Logger.Warn("IXMindWriterOutputConfig.Path was overridden");
+                //TODO: consider to use INotifyPropertyChanged for this side effect
+                Logger.Warn($"IXMindWriterOutputConfig.Path was overridden: oldValue:{Path}, newValue: {path}");
             }
             Path = path;
             return this;

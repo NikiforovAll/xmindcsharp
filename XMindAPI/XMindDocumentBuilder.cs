@@ -9,6 +9,7 @@ namespace XMindAPI
     internal class XMindDocumentBuilder
     {
          private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+         private readonly IConfiguration _xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
         public XMindDocumentBuilder()
         {
         }
@@ -18,7 +19,7 @@ namespace XMindAPI
             metaFile.Declaration = new XDeclaration("1.0", "UTF-8", "no");
             metaFile.Add(
                 new XElement(
-                    XNamespace.Get(XMindConfigurationCache.Configuration.XMindConfigCollection["metaNamespace"]) + "meta",
+                    XNamespace.Get(_xMindSettings["metaNamespace"]) + "meta",
                     new XAttribute("version", "2.0")
                 )
             );
@@ -29,7 +30,7 @@ namespace XMindAPI
         {
             var manifest = new XDocument();
             manifest.Declaration = new XDeclaration("1.0", "UTF-8", "no");
-            var manifestNamespace = XNamespace.Get(XMindConfigurationCache.Configuration.XMindConfigCollection["manifestNamespace"]);
+            var manifestNamespace = XNamespace.Get(_xMindSettings["manifestNamespace"]);
             var manifestFileEntryToken = manifestNamespace + "file-entry";
             XElement rootElement = new XElement(manifestNamespace + "manifest");
             rootElement.Add(
@@ -63,17 +64,16 @@ namespace XMindAPI
         public XDocument CreateDefaultContentFile()
         {
             var content = new XDocument();
-            IConfiguration xmindConfig = XMindConfigurationCache.Configuration.XMindConfigCollection;
-            XNamespace ns2 = XNamespace.Get(xmindConfig["standardContentNamespaces:xsl"]);
-            XNamespace ns3 = XNamespace.Get(xmindConfig["standardContentNamespaces:svg"]);
-            XNamespace ns4 = XNamespace.Get(xmindConfig["standardContentNamespaces:xhtml"]);
+            XNamespace ns2 = XNamespace.Get(_xMindSettings["standardContentNamespaces:xsl"]);
+            XNamespace ns3 = XNamespace.Get(_xMindSettings["standardContentNamespaces:svg"]);
+            XNamespace ns4 = XNamespace.Get(_xMindSettings["standardContentNamespaces:xhtml"]);
 
             content.Add(new XElement(
-                XNamespace.Get(xmindConfig["contentNamespace"]) + "xmap-content",
+                XNamespace.Get(_xMindSettings["contentNamespace"]) + "xmap-content",
                 new XAttribute(XNamespace.Xmlns + "fo", ns2),
                 new XAttribute(XNamespace.Xmlns + "svg", ns3),
                 new XAttribute(XNamespace.Xmlns + "xhtml", ns4),
-                new XAttribute(XNamespace.Xmlns + "xlink", XNamespace.Get(xmindConfig["xlinkNamespace"])),
+                new XAttribute(XNamespace.Xmlns + "xlink", XNamespace.Get(_xMindSettings["xlinkNamespace"])),
                 new XAttribute("version", "2.0")
             ));
             return content;

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Serilog;
 using Serilog.Sinks.TestCorrelator;
 using XMindAPI;
+using XMindAPI.Extensions;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
 using XMindAPI.Writers.Util;
@@ -22,22 +23,26 @@ namespace Tests
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Sink(new TestCorrelatorSink())
-                .WriteTo.File("{Date}.log", retainedFileCountLimit: 3)
+                .WriteTo.File("test.log", retainedFileCountLimit: 3)
                 .CreateLogger();
         }
 
         [Test]
-        public void Save_CreateEmptyBookWithLogger_Success()
+        public void Save_CreateEmptyBookWithLogWriter_Success()
         {
-           var book = new XMindConfiguration()
-                .WriteTo
-                .SetFinalizeAction(context => Log.Logger.Information("Finalized"))
-                .Writer(new LoggerWriter()
-                        .SetOutput(new LoggerWriterOutputConfig("root")))
-                .CreateWorkBook("test");
+            //Arrange
+            var book = new XMindConfiguration()
+                 .WriteTo
+                 .SetFinalizeAction(context => Log.Logger.Information("Finalized"))
+                 .Writer(new LoggerWriter()
+                         .SetOutput(new LoggerWriterOutputConfig(outputName: "root")))
+                 .CreateWorkBook(fileName: "test");
+            
             using (TestCorrelator.CreateContext())
             {
+                //Act
                 book.Save();
+                //Assert
                 TestCorrelator.GetLogEventsFromCurrentContext()
                 .Where(e => e.Level == Serilog.Events.LogEventLevel.Information)
                 .Should()
@@ -50,6 +55,20 @@ namespace Tests
         }
 
         [Test]
+        public void Save_CreateEmptyBookWithInMemoryWriter_Success()
+        {
+            //Arrange
+            var book = new XMindConfiguration()
+                 .WriteTo
+                 .Writer(new InMemoryWriter()
+                         .SetOutput(new InMemoryWriterOutputConfig(outputName: "root")))
+                 .CreateWorkBook(fileName: "test");
+            //Act
+            book.Save();
+            //Assert
+        }
+
+        [Test]
         public void Save_CreateEmptyBookWithFileWriterInCaseOfCustomBasePath_Success()
         {
             var book = new XMindConfiguration()
@@ -58,37 +77,36 @@ namespace Tests
                         new FileWriter()
                             .SetOutput(new FileWriterOutputConfig("manifest.xml").SetBasePath("custom-output/META-INF")),
                         new FileWriter()
-                            .SetOutput(new FileWriterOutputConfig("root.xml").SetBasePath("custom-output/"))
+                            .SetOutput(new FileWriterOutputConfig("meta.xml").SetBasePath("custom-output/")),
+                        new FileWriter()
+                            .SetOutput(new FileWriterOutputConfig("content.xml").SetBasePath("custom-output/"))
                     })
                 .WriteTo.SetWriterBinding(
+                    //selected based on OutPutName in IXMindWriterOutputConfig
                     new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{
                         FileWriterUtils.ResolveManifestFile, 
-                        FileWriterUtils.ResolveOtherFiles
+                        FileWriterUtils.ResolveMetaFile,
+                        FileWriterUtils.ResolveContentFile
                     }
                 )
-                .CreateWorkBook("test");
+                .CreateWorkBook(fileName: "test");
+            //Act
             book.Save();
+            //Assert
             //TODO: add assertions, test IO properly, ideally it unit tests should not leave artifacts
         }
 
         [Test]
         public void Save_CreateEmptyBookWithDefaultPath_Success()
         {
+            //Arrange
             var book = new XMindConfiguration()
-                .WriteTo.Writers(
-                    new List<IXMindWriter>{
-                        new FileWriter().SetOutput(new FileWriterOutputConfig("manifest.xml", true)),
-                        new FileWriter().SetOutput(new FileWriterOutputConfig("default", true))
-                    })
-                .WriteTo.SetWriterBinding(
-                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{
-                        FileWriterUtils.ResolveManifestFile, 
-                        FileWriterUtils.ResolveOtherFiles
-                    }
-                )
-                .CreateWorkBook("test");
+                .SetUpXMindWithFileWriter(defaultSettings: true)
+                .CreateWorkBook(fileName: "test");
+            //Act
             book.Save();
+            //Assert
             //TODO: add assertions, test IO properly, ideally it unit tests should not leave artifacts
         }
     }
-}   
+}

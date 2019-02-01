@@ -12,7 +12,7 @@
     "output": {
         "definition":{
             "manifest": "manifest.xml",
-            "metadata": "metadata.xml",
+            "meta": "meta.xml",
             "content": "content.xml",
             "default": "default"
         },

@@ -553,10 +553,9 @@ namespace XMindAPI
         /// </summary>
         public void Save()
         {
-
             var manifestFileName = _xMindSettings.XMindConfigCollection["output:definition:manifest"];
-            var metaFileName = _xMindSettings.XMindConfigCollection["output:definition:metadata"];
-            var contentFileName = _xMindSettings.XMindConfigCollection["output:definition:content"];;
+            var metaFileName = _xMindSettings.XMindConfigCollection["output:definition:meta"];
+            var contentFileName = _xMindSettings.XMindConfigCollection["output:definition:content"];
 
             var files = new Dictionary<string, XDocument>(3)
             {
@@ -568,18 +567,19 @@ namespace XMindAPI
             var writerContexts = new List<XMindWriterContext>();
             foreach (var kvp in files)
             {
-                var currentWriterContext = new XMindWriterContext(){
+                var currentWriterContext = new XMindWriterContext()
+                {
                     FileName = kvp.Key,
-                    FileEntries = new XDocument[1]{kvp.Value}
+                    FileEntries = new XDocument[1] { kvp.Value }
                 };
-                var selectedWriter = _globalConfiguration
+                var selectedWriters = _globalConfiguration
                     .WriteTo
-                    .ResolveWriter(currentWriterContext);
-                if(selectedWriter == null)
+                    .ResolveWriters(currentWriterContext);
+                if (selectedWriters == null)
                 {
                     throw new InvalidOperationException("XMindBook.Save: Writer is not selected");
                 }
-                selectedWriter.WriteToStorage(kvp.Value, kvp.Key);
+                selectedWriters.ForEach(w => w.WriteToStorage(kvp.Value, kvp.Key));
                 writerContexts.Add(currentWriterContext);
             }
             _globalConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts);

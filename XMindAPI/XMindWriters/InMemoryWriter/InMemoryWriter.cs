@@ -8,13 +8,16 @@ namespace XMindAPI.Writers
 {
     public class InMemoryWriter : IXMindWriter
     {
-        private Dictionary<string, XDocument> _documentStorage;
+        private readonly Dictionary<string, XDocument> _documentStorage = new Dictionary<string, XDocument>();
         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
         private IXMindWriterOutputConfig _output;
 
-        public Dictionary<string, XDocument> DocumentStorage { get => _documentStorage; private set => _documentStorage = value; }
+        public Dictionary<string, XDocument> DocumentStorage { get => _documentStorage;} 
 
+        public InMemoryWriter() : this(new FileWriterOutputConfig("root"))
+        {
+        }
         public InMemoryWriter(IXMindWriterOutputConfig output)
         {
             SetOutput(output);

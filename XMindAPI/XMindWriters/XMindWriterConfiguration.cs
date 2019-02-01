@@ -1,4 +1,4 @@
-using XMindAPI.Writers;
+// using XMindAPI.Writers;
 using XMindAPI.Configuration;
 using XMindAPI.Logging;
 using System;
@@ -13,7 +13,7 @@ namespace XMindAPI.Writers.Configuration
     {
         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         internal Action<List<XMindWriterContext>> FinalizeAction { get => _finalizeAction; private set => _finalizeAction = value; }
-        private readonly XMindConfiguration _xmindConfiguration;
+        private readonly XMindConfiguration _xMindConfiguration;
         private Action<List<XMindWriterContext>> _finalizeAction; 
         
         // internal IXMindWriter MainWriter { get => _writer; set => _writer = value; }
@@ -23,25 +23,29 @@ namespace XMindAPI.Writers.Configuration
 
         public XMindWriterConfiguration(XMindConfiguration xMindConfiguration)
         {
-            this._xmindConfiguration = xMindConfiguration;
+            this._xMindConfiguration = xMindConfiguration;
         }
 
         public XMindConfiguration Writer(IXMindWriter writer)
         {
             _writers = new List<IXMindWriter>{writer};
-            return _xmindConfiguration;
+            return _xMindConfiguration;
         }
 
         public XMindConfiguration Writers(List<IXMindWriter> writers)
         {
             _writers = writers;
-            return _xmindConfiguration;
+            foreach (var writer in writers)
+            {
+                //Accept resolver
+            }
+            return _xMindConfiguration;
         }
 
         public XMindConfiguration SetWriterBinding(List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>> criteria)
         {
             _criteria = criteria;
-            return _xmindConfiguration;
+            return _xMindConfiguration;
         }
 
         public XMindWriterConfiguration SetFinalizeAction(Action<List<XMindWriterContext>> action)
@@ -50,20 +54,24 @@ namespace XMindAPI.Writers.Configuration
             return this;
         }
 
-        internal IXMindWriter ResolveWriter(XMindWriterContext context)
+        internal List<IXMindWriter> ResolveWriters(XMindWriterContext context)
         {
+            if(_writers == null || !_writers.Any())
+            {
+                throw new InvalidOperationException("XMindConfiguration.ResolveWriter: Writer is not specified");
+            }
             if(_criteria == null){
-                if(_writers != null && _writers.Any()){
                     Logger.WarnFormat("XMindConfiguration.ResolveWriter: default writer is assigned");
-                    return _writers[0];
-                }else
-                {
-                    throw new InvalidOperationException("XMindConfiguration.ResolveWriter: Writer is not specified");
-                }
+                    return _writers.Take(1).ToList();
             } 
-            var writerFound = _criteria.Select(w => w.Invoke(context, _writers)).Where(w => w != null).FirstOrDefault();
-            return writerFound;
+            var writersFound = _criteria.Select(w => w.Invoke(context, _writers)).Where(w => w != null);
+            Logger.Debug($"For context.FileName: {context.FileName} ResolveWriters.writersFound: {writersFound.Count()}");
+            return writersFound.ToList();
         }
 
+        internal void AddResolver(Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter> criteria)
+        {
+            _criteria.Add(criteria);
+        }
     }
 }

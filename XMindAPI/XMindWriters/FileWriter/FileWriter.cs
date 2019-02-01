@@ -1,24 +1,26 @@
+using System;
 using System.IO;
 using System.Xml.Linq;
-using XMindAPI;
-using XMindAPI.Logging;
 using System.Collections.Generic;
-using System;
 using Microsoft.Extensions.Configuration;
+using XMindAPI;
 
 namespace XMindAPI.Writers
 {
     public class FileWriter : IXMindWriter
     {
-        // private Dictionary<string, XDocument> _documentStorage;
-        private FileWriterSettings Settings {get; set;}
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+        // private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
-        private IXMindWriterOutputConfig _output;
-        private IConfiguration _xMindSettings;
+        // private IConfiguration _xMindSettings;
+        internal IXMindWriterOutputConfig _output;
 
-        // public Dictionary<string, XDocument> DocumentStorage { get => _documentStorage; private set => _documentStorage = value; }
-
+        internal readonly bool _isAutoAddedResolver = false; 
+        internal readonly FileWriterStandardOutput _fileWriterStandardOutput;
+        public FileWriter(FileWriterStandardOutput standardOutput)
+        {
+            _isAutoAddedResolver = true;
+            _fileWriterStandardOutput = standardOutput;
+        }
         public FileWriter() : this(new FileWriterOutputConfig("root"))
         {
         }
@@ -26,9 +28,7 @@ namespace XMindAPI.Writers
         public FileWriter(IXMindWriterOutputConfig output)
         {
             SetOutput(output);
-            // ReadSettingsFromConfiguration();
-            _xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
-            
+            // _xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
         }
         public IXMindWriter SetOutput(IXMindWriterOutputConfig output)
         {
