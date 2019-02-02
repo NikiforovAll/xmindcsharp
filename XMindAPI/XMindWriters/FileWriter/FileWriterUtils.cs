@@ -30,30 +30,40 @@ namespace XMindAPI.Writers.Util
         }
 
 
-        public static Action<List<XMindWriterContext>> ZipXMindFolder(string xmindFileNane)
+        public static Action<List<XMindWriterContext>> ZipXMindFolder(string xmindFileName)
         {
             var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
-            var filesToZipLabels = new string[] { "output:definition:meta", "output:definition:manifest", "output:definition:content" };
-            var filesToZip = xMindSettings
-                .GetSection("output:files")
-                .GetChildren()
-                .Where(token => xMindSettings.GetSection("output:definition").GetChildren().Select(x => x.Value).Contains(token.Value))
-                .Select(token =>
-                {
-                    var fileName = token["name"];
-                    var fileLocation = token["location"];
-                    var fileToken = (file: fileName, path: Path.Combine(fileLocation, fileName));
-                    return fileToken;
-                });
-
+            var filesToZipLabels = new string[] {
+                "output:definition:meta",
+                "output:definition:manifest",
+                "output:definition:content"
+            };
+            var fileNames = filesToZipLabels.Select(label => xMindSettings[label]).ToList();
+            var filesToZip = xMindSettings.GetSection("output:files")
+            .GetChildren().Where(
+                x => fileNames
+                        .Contains(
+                            x.GetChildren()
+                                .Where(el => el.Key == "name").Select(el => el.Value).FirstOrDefault()
+                        )
+                    )
+                    .Select(x => (File: x["name"], Path: x["location"]))
+                    .ToList();
             return ctx =>
             {
 
-                using (ZipStorer zip = ZipStorer.Create(xmindFileNane, string.Empty))
+                using (ZipStorer zip = ZipStorer.Create(Path.Combine(xMindSettings["output:base"], xmindFileName), string.Empty))
                 {
+
                     foreach (var fileToken in filesToZip)
                     {
-                        zip.AddFile(ZipStorer.Compression.Deflate, fileToken.path, fileToken.file, string.Empty);
+                        var fullPath = Path.Combine(
+                            Environment.CurrentDirectory,
+                            XMindConfigurationCache.Configuration.XMindConfigCollection["output:base"],
+                            fileToken.Path,
+                            fileToken.File
+                        );
+                        zip.AddFile(ZipStorer.Compression.Deflate, fullPath, fileToken.File, string.Empty);
                     }
                     // zip.AddFile(ZipStorer.Compression.Deflate, "META-INF\\manifest.xml", "manifest.xml", string.Empty);
                     // zip.AddFile(ZipStorer.Compression.Deflate, "meta.xml", "meta.xml", string.Empty);

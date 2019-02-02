@@ -6,7 +6,10 @@ namespace XMindAPI.Extensions
 {
     public static class XMindConfigurationExtensions
     {
-        public static XMindConfiguration SetUpXMindWithFileWriter(this XMindConfiguration config, bool defaultSettings = true, bool zip = false)
+        public static XMindConfiguration SetUpXMindWithFileWriter(
+            this XMindConfiguration config,
+            bool defaultSettings = true,
+            bool zip = false)
         {
             var standardWriters = new List<FileWriterStandardOutput>{
                 FileWriterStandardOutput.Manifest,
@@ -15,7 +18,10 @@ namespace XMindAPI.Extensions
             };
             var result = config.WriteTo.Writers(FileWriterFactory.CreateWriters(standardWriters))
                 .WriteTo.SetWriterBinding(FileWriterFactory.CreateResolvers(standardWriters));
-            result.WriteTo.SetFinalizeAction(FileWriterUtils.ZipXMindFolder("build.xmind"));
+            if(zip)
+            {
+                result.WriteTo.SetFinalizeAction(FileWriterUtils.ZipXMindFolder("build.xmind"));
+            }
             return result;
         }
     }
