@@ -20,19 +20,11 @@ These instructions will get you a copy of the project up and running on your loc
 * add Travis/Appveyor support
 
 * write .xmind to XDocument converter
-* add multiple resolvers support
-* unit test file writer
-  * <https://stackoverflow.com/questions/1528134/unit-testing-file-i-o>
-  * add exception handling for different cases, custom exceptions (?)
+* add exception handling for different cases, custom exceptions (?)
 * reusable validation logic across Writers
   * IXMindWriterOutputConfig
   * investigate for more
 * zip finilizer for FileWriter
-* check that all unit tests are complete
-  * add test for in-memory writer
-  * test all kinds of writers simultaneously (check logger resolution logic)
-* Test for in-memory writer
-
 ### Prerequisites
 
 What things you need to install the software and how to install them

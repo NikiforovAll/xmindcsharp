@@ -7,10 +7,8 @@ using System.Collections.Generic;
 using Serilog;
 using Serilog.Sinks.TestCorrelator;
 using XMindAPI;
-using XMindAPI.Extensions;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
-using XMindAPI.Writers.Util;
 using FluentAssertions;
 namespace Tests
 {
@@ -36,7 +34,7 @@ namespace Tests
                  .SetFinalizeAction(context => Log.Logger.Information("Finalized"))
                  .Writer(new LoggerWriter()
                          .SetOutput(new LoggerWriterOutputConfig(outputName: "root")))
-                 .CreateWorkBook(fileName: "test");
+                 .CreateWorkBook(workbookName: "test");
             
             using (TestCorrelator.CreateContext())
             {
@@ -57,56 +55,19 @@ namespace Tests
         [Test]
         public void Save_CreateEmptyBookWithInMemoryWriter_Success()
         {
+            var writer = (InMemoryWriter) new InMemoryWriter()
+                .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
             //Arrange
             var book = new XMindConfiguration()
                  .WriteTo
-                 .Writer(new InMemoryWriter()
-                         .SetOutput(new InMemoryWriterOutputConfig(outputName: "root")))
-                 .CreateWorkBook(fileName: "test");
+                 .Writer(writer)
+                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();
             //Assert
-        }
-
-        [Test]
-        public void Save_CreateEmptyBookWithFileWriterInCaseOfCustomBasePath_Success()
-        {
-            var book = new XMindConfiguration()
-                .WriteTo.Writers(
-                    new List<IXMindWriter>{
-                        new FileWriter()
-                            .SetOutput(new FileWriterOutputConfig("manifest.xml").SetBasePath("custom-output/META-INF")),
-                        new FileWriter()
-                            .SetOutput(new FileWriterOutputConfig("meta.xml").SetBasePath("custom-output/")),
-                        new FileWriter()
-                            .SetOutput(new FileWriterOutputConfig("content.xml").SetBasePath("custom-output/"))
-                    })
-                .WriteTo.SetWriterBinding(
-                    //selected based on OutPutName in IXMindWriterOutputConfig
-                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{
-                        FileWriterUtils.ResolveManifestFile, 
-                        FileWriterUtils.ResolveMetaFile,
-                        FileWriterUtils.ResolveContentFile
-                    }
-                )
-                .CreateWorkBook(fileName: "test");
-            //Act
-            book.Save();
-            //Assert
-            //TODO: add assertions, test IO properly, ideally it unit tests should not leave artifacts
-        }
-
-        [Test]
-        public void Save_CreateEmptyBookWithDefaultPath_Success()
-        {
-            //Arrange
-            var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(defaultSettings: true)
-                .CreateWorkBook(fileName: "test");
-            //Act
-            book.Save();
-            //Assert
-            //TODO: add assertions, test IO properly, ideally it unit tests should not leave artifacts
+            writer.DocumentStorage.Keys.Should().NotBeEmpty().And
+                .HaveCount(3).And
+                .BeEquivalentTo("manifest.xml", "meta.xml", "content.xml");
         }
     }
 }
