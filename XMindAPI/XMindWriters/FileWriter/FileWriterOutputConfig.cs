@@ -24,12 +24,11 @@ namespace XMindAPI.Writers
             var basePath = xMindSettings["output:base"];
             var sectionGroup = xMindSettings.GetSection("output:files").GetChildren()
                 .SelectMany(c => c.GetChildren(), (section, token) => new {section, token})
-                .Where(group => group.token.Key == "name" && group.token.Value == outputName)
-                .FirstOrDefault();
+                .FirstOrDefault(group => group.token.Key == "name" && group.token.Value == outputName);
             var path = sectionGroup?
                 .section?
                 .GetChildren()?
-                .Where(t => t.Key.Equals("location")).FirstOrDefault();
+                .FirstOrDefault(t => t.Key.Equals("location"));
             if(path != null)
             {
                 Path = System.IO.Path.Combine(basePath, path.Value);

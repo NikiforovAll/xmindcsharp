@@ -79,8 +79,7 @@ namespace XMindAPI.Writers.Util
             var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
             var file = xMindSettings[fileLabel];
             var writerFound = writers
-                .Where(w => context.FileName.Equals(file) && w.GetOutputConfig().OutputName.Equals(file))
-                .FirstOrDefault();
+                .FirstOrDefault(w => context.FileName.Equals(file) && w.GetOutputConfig().OutputName.Equals(file));
             return writerFound;
         }
     }

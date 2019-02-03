@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<RootNamespace>XMindAPI</RootNamespace>
 	</PropertyGroup>
 
+
 	<ItemGroup>
 		<PackageReference Include="liblog" Version="5.0.5">
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-		  <PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
@@ -15,14 +16,20 @@
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
 	</ItemGroup>
 	<PropertyGroup>
-		<GenerateDocumentationFile>
-			true
-		</GenerateDocumentationFile>
-		<DocumentationFile>
-			bin\XMindAPI.xml
-		</DocumentationFile>
+		<Description>XMind API that allows to build .xmind files programmatically</Description>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>bin\XMindAPI.xml</DocumentationFile>
 	</PropertyGroup>
-  <ItemGroup>
-    <None Include="$(ProjectDir)xmindsettings.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+
+	<PropertyGroup>
+		<PackageId>XMindCSharp</PackageId>
+		<Version></Version>
+		<Authors>Alexey Nikiforov</Authors>
+		<Copyright>© Alexey Nikiforov</Copyright>
+		<Company> HYS Enterprise</Company>
+		<PackageTags>xmind;tools;mindmaps</PackageTags>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="$(ProjectDir)xmindsettings.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 </Project>
