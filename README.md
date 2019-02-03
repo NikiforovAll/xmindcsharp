@@ -14,17 +14,12 @@ These instructions will get you a copy of the project up and running on your loc
     * links between topic
     * hyper-links
 
-* add guide for conventional commits and probably automate stuff around that approach.
-
-* add appsettings file to assembly/manifest (deployment stage/flow)
-* add Travis/Appveyor support
 
 * write .xmind to XDocument converter
-* add exception handling for different cases, custom exceptions (?)
-* reusable validation logic across Writers
-  * IXMindWriterOutputConfig
-  * investigate for more
-* zip finilizer for FileWriter
+
+* add guide for conventional commits and probably automate stuff around that approach.
+* add appsettings file to assembly/manifest (deployment stage/flow)
+* add Travis/Appveyor support
 ### Prerequisites
 
 What things you need to install the software and how to install them
