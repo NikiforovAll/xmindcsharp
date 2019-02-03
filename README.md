@@ -14,26 +14,13 @@ These instructions will get you a copy of the project up and running on your loc
     * markers (probably already implemented)
     * links between topic
     * hyper-links
-* investigate standard xmind api and adjust current api so that it resembles original one
-* add guide for conventional commits and probably automate stuff around that approach.
 
-* add appsettings file to assembly/manifest (deployment stage/flow)
-* add Travis/Appveyor support
 
 * write .xmind to XDocument converter
-* unit test file writer
-  * <https://stackoverflow.com/questions/1528134/unit-testing-file-i-o>
-  * add exception handling for different cases, custom exceptions (?)
-* reusable validation logic across Writers
-  * IXMindWriterOutputConfig
-  * investigate for more
-* zip finilizer for FileWriter
-* add unit test in case of multiple resolvers
-* check that all unit tests are complete
-  * add test for in-memory writer
-  * test all kinds of writers simultaneously (check logger resolution logic)
-* Test for in-memory writer
 
+* add guide for conventional commits and probably automate stuff around that approach.
+* add appsettings file to assembly/manifest (deployment stage/flow)
+* add Travis/Appveyor support
 ### Prerequisites
 
 What things you need to install the software and how to install them

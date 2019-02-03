@@ -20,9 +20,9 @@ namespace XMindAPI.Configuration
             return new XMindWorkBook(fileName, loadContent, this, XMindConfigurationCache.Configuration);
         }
 
-        public XMindWorkBook CreateWorkBook(string fileName)
+        public XMindWorkBook CreateWorkBook(string workbookName)
         {
-            return CreateWorkBook(fileName, false);
+            return CreateWorkBook(workbookName, false);
         }
     }
 }
