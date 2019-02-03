@@ -1,7 +1,7 @@
 environment:
   major: 0
   minor: 1
-  patch: 1
+  patch: 2
 
 version: $(major).$(minor).$(patch)+{branch}-{build}
 
@@ -22,6 +22,7 @@ build:
 
 deploy:
   - provider: NuGet
+    server: https://api.nuget.org/v3/index.json
     api_key:
       secure: Q8wPLGWf+Cl+0mQWUi6Ov+SkthWfB2P2QElWCSoAnIUTfCkjs/9php/qrAori1xl
     skip_symbols: false
