@@ -1,31 +1,57 @@
-# XMindCSharp [![AppVeyor Badge](https://ci.appveyor.com/api/projects/status/xtmsp1i4ot8j6tbs?svg=true)](https://ci.appveyor.com/project/NikiforovAll/xmindcsharp/branch/master) [![NuGet Badge](https://buildstats.info/nuget/xmindcsharp)](https://www.nuget.org/packages/xmindcsharp/)
+# XMindCSharp [![AppVeyor Badge](https://ci.appveyor.com/api/projects/status/xtmsp1i4ot8j6tbs?svg=true)](https://ci.appveyor.com/project/NikiforovAll/xmindcsharp/branch/master) [![NuGet Badge](https://buildstats.info/nuget/xmindcsharp)](https://www.nuget.org/packages/xmindcsharp/) [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 XMind API that allows to build .xmind files programmatically
 
 ## Getting Started
 
-## TODO
-
-* refactor XMindWorkBook
-  * basic set functionality:
-    * markers (probably already implemented)
-    * links between topic
-    * hyper-links
-
-* write .xmind to XDocument converter
-* add guide for conventional commits and probably automate stuff around that approach.
-
 ### Installing
+
+```
+dotnet add package XMindCsharp
+```
 
 ## Running the tests
 
+Run following command from the root folder:
+```bash
+dotnet test ./XMindAPI.Tests/
+```
+
 ## Deployment
 
-## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
+## Git Commit Guidelines
 
-We use Conventional Commits: <https://www.conventionalcommits.org/en/v1.0.0-beta.2/#specification>
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Type
+
+Must be one of the following:
+
+* **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+* **ci**: Changes to our CI configuration files and scripts (example scopes: Circle, BrowserStack, SauceLabs)
+* **docs**: Documentation only changes
+* **feat**: A new feature
+* **fix**: A bug fix
+* **perf**: A code change that improves performance
+* **refactor**: A code change that neither fixes a bug nor adds a feature
+* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+* **test**: Adding missing tests or correcting existing tests
+
+### Scope
+
+The following is the list of supported scopes:
+
+* project_infrastructure
+* readme
+* core_functionality
+* [TBD]
 
 ## Authors
 
