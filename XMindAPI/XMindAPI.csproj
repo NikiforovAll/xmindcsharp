@@ -27,7 +27,10 @@
 		<Authors>Alexey Nikiforov</Authors>
 		<Copyright>© Alexey Nikiforov</Copyright>
 		<Company> HYS Enterprise</Company>
-		<PackageTags>xmind;tools;mindmaps</PackageTags>
+		<PackageTags>xmind;tools;mindmaps;productivity</PackageTags>
+		<RepositoryUrl>https://github.com/NikiforovAll/xmindcsharp/</RepositoryUrl>
+		<PackageLicenseUrl>https://github.com/NikiforovAll/xmindcsharp/blob/master/LICENSE</PackageLicenseUrl>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="$(ProjectDir)xmindsettings.json" CopyToOutputDirectory="PreserveNewest" />
