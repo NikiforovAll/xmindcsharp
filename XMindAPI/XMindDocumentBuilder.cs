@@ -6,14 +6,41 @@ using XMindAPI.Logging;
 
 namespace XMindAPI
 {
-    internal class XMindDocumentBuilder
+    internal class XMindDocumentBuilder : IXMindDocumentBuilder
     {
-         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
-         private readonly IConfiguration _xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+        private readonly IConfiguration _xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+
+        protected XDocument _manifestData = null;
+        protected XDocument _metaData = null;
+        protected XDocument _contentData = null;
+
+        public XDocument MetaFile { get => _metaData; }
+        public XDocument ManifestFile { get => _manifestData;}
+        public XDocument ContentFile { get => _contentData; }
+
         public XMindDocumentBuilder()
         {
         }
-        public XDocument CreateDefaultMetaFile()
+        public virtual XDocument CreateMetaFile()
+        {
+            this._metaData = CreateDefaultMetaFile();
+            return this._metaData;
+        }
+
+        public virtual XDocument CreateManifestFile()
+        {
+            this._manifestData = CreateDefaultManifestFile();
+            return this._manifestData;
+        }
+
+        public virtual XDocument CreateContentFile()
+        {
+            this._contentData = CreateDefaultContentFile();
+            return this._contentData;
+        }
+
+        private XDocument CreateDefaultMetaFile()
         {
             XDocument metaFile = new XDocument();
             metaFile.Declaration = new XDeclaration("1.0", "UTF-8", "no");
@@ -26,7 +53,7 @@ namespace XMindAPI
             return metaFile;
         }
 
-        public XDocument CreateDefaultManifestFile()
+        private XDocument CreateDefaultManifestFile()
         {
             var manifest = new XDocument();
             manifest.Declaration = new XDeclaration("1.0", "UTF-8", "no");
@@ -61,7 +88,7 @@ namespace XMindAPI
             return manifest;
         }
 
-        public XDocument CreateDefaultContentFile()
+        private XDocument CreateDefaultContentFile()
         {
             var content = new XDocument();
             XNamespace ns2 = XNamespace.Get(_xMindSettings["standardContentNamespaces:xsl"]);
