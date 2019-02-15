@@ -32,7 +32,6 @@ namespace Tests
         public void Save_CreateEmptyBookWithFileWriterInCaseOfCustomBasePath_Success()
         {
 
-            var _customOutputFolderName = "custom-output/";
             var book = new XMindConfiguration()
                 .WriteTo.Writers(
                     new List<IXMindWriter>{

@@ -15,13 +15,11 @@ namespace XMindAPI.Configuration
             WriteTo = new XMindWriterConfiguration(this);
         }
 
-        public XMindWorkBook CreateWorkBook(string workbookName, string fileName, bool loadContent)
+        public XMindWorkBook CreateWorkBook(string workbookName, string fileName, bool loadContent = true)
         {
-            var workbook = new XMindWorkBook(this, XMindConfigurationCache.Configuration);
-            if(loadContent){
-                //TODO: add load handling
-                // workbook.Load(fileName);
-            }
+            // could be replaced with factory method
+            IXMindDocumentBuilder builder = loadContent ? new XMindFileDocumentBuilder(fileName): new XMindDocumentBuilder();
+            var workbook = new XMindWorkBook(this, XMindConfigurationCache.Configuration, builder);
             return workbook;
         }
 

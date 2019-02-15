@@ -22,13 +22,13 @@ namespace XMindAPI.Writers
             switch (standardOutputType)
             {
                 case FileWriterStandardOutput.Manifest:
-                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings["output:definition:manifest"], true));
+                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings[XMindConfigurationCache.ManifestLabel], true));
                     break;
                 case FileWriterStandardOutput.Meta:
-                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings["output:definition:meta"], true));;
+                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings[XMindConfigurationCache.MetaLabel], true));
                     break;
                 case FileWriterStandardOutput.Content:
-                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings["output:definition:content"], true));;
+                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings[XMindConfigurationCache.ContentLabel], true));
                     break;
                 default:
                     result = null;

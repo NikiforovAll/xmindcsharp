@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.IO.Compression;
-using System.Collections.Generic;
 
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
@@ -32,15 +31,15 @@ namespace XMindAPI
         /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
         /// </summary>
         // /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
-        internal XMindWorkBook(XMindConfiguration globalConfiguration, XMindConfigurationCache config)
+        internal XMindWorkBook(XMindConfiguration globalConfiguration, XMindConfigurationCache config, IXMindDocumentBuilder builder)
         {
             _xMindSettings = config;
             _globalConfiguration = globalConfiguration;
-            _documentBuilder = new XMindDocumentBuilder();
+            _documentBuilder = builder;
             _documentBuilder.CreateMetaFile();
             _documentBuilder.CreateManifestFile();
             _documentBuilder.CreateContentFile();
-            //TODO: use builder in order to work with XDocuments, ideally get rid of this namespace in workbook
+            //TODO: use builder in order to work with XDocuments, ideally get rid of XML namespace in workbook
         }
 
         public List<XMindSheet> GetSheetInfo()
@@ -550,9 +549,9 @@ namespace XMindAPI
         /// </summary>
         public void Save()
         {
-            var manifestFileName = _xMindSettings.XMindConfigCollection["output:definition:manifest"];
-            var metaFileName = _xMindSettings.XMindConfigCollection["output:definition:meta"];
-            var contentFileName = _xMindSettings.XMindConfigCollection["output:definition:content"];
+            var manifestFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.ManifestLabel];
+            var metaFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.MetaLabel];
+            var contentFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.ContentLabel];
 
             var files = new Dictionary<string, XDocument>(3)
             {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using XMindAPI.Logging;
@@ -20,18 +21,15 @@ namespace XMindAPI.Writers
 
         public FileWriterOutputConfig(string outputName, bool useDefaultPath):this(outputName)
         {
-            var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
-            var basePath = xMindSettings["output:base"];
-            var sectionGroup = xMindSettings.GetSection("output:files").GetChildren()
-                .SelectMany(c => c.GetChildren(), (section, token) => new {section, token})
-                .FirstOrDefault(group => group.token.Key == "name" && group.token.Value == outputName);
-            var path = sectionGroup?
-                .section?
-                .GetChildren()?
-                .FirstOrDefault(t => t.Key.Equals("location"));
-            if(path != null)
-            {
-                Path = System.IO.Path.Combine(basePath, path.Value);
+            if(useDefaultPath){
+                var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+                var basePath = xMindSettings["output:base"];
+                Dictionary<string, string> locations = XMindConfigurationCache.Configuration.GetOutputFilesLocations();
+                var path = locations[outputName];
+                if(path != null)
+                {
+                    Path = System.IO.Path.Combine(basePath, path);
+                }
             }
         }
 
