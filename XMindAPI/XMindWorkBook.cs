@@ -575,7 +575,11 @@ namespace XMindAPI
                 {
                     throw new InvalidOperationException("XMindBook.Save: Writer is not selected");
                 }
-                selectedWriters.ForEach(w => w.WriteToStorage(kvp.Value, kvp.Key));
+
+                foreach (var writer in selectedWriters)
+                {
+                    writer.WriteToStorage(kvp.Value, kvp.Key);
+                }
                 writerContexts.Add(currentWriterContext);
             }
             _globalConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts);

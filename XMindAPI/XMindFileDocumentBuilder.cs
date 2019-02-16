@@ -60,7 +60,7 @@ namespace XMindAPI
         {
             if (String.IsNullOrEmpty(fileName) || !File.Exists(fileName))
             {
-                throw new InvalidOperationException("XMind file is not loaded");
+                throw new InvalidOperationException($"XMind file {fileName} is not loaded");
             }
             FileInfo xMindFileInfo = new FileInfo(fileName);
             Logger.Info($"XMindFile loaded: {xMindFileInfo.FullName}");

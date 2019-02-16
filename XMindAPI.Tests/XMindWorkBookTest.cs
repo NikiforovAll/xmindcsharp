@@ -19,7 +19,7 @@ namespace Tests
     public class XMindWorkBookTest
     {
 
-        private readonly string _customOutputFolderName = "test-output";
+        private readonly string _customOutputFolderName = Path.Combine(Path.GetTempPath(), "test-output");
         private readonly string[] _files = { "manifest.xml", "meta.xml", "content.xml" };
         private readonly bool _isCleanUpNeeded = false;
 
@@ -89,12 +89,12 @@ namespace Tests
 
             var writer = (InMemoryWriter)new InMemoryWriter()
             .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
+            book.Save();
             var book2 = new XMindConfiguration()
                  .WriteTo
                  .Writer(writer)
                  .CreateWorkBook(sourceFileName: Path.Combine(_customOutputFolderName, "build.xmind"), workbookName: "test2");
             //Act
-            book.Save();
             book2.Save();
             //Assert
             writer.DocumentStorage.Keys.Should().NotBeEmpty().And
