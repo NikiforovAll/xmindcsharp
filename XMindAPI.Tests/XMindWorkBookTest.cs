@@ -11,6 +11,7 @@ using XMindAPI.Configuration;
 using XMindAPI.Writers;
 using FluentAssertions;
 using XMindAPI.Writers.Util;
+using XMindAPI.Extensions;
 
 namespace Tests
 {
@@ -37,9 +38,9 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                 .WriteTo.SetFinalizeAction(context => Log.Logger.Information("Finalized"))
-                 .Writer(new LoggerWriter()
+                 .WriteTo.Writer(new LoggerWriter()
                          .SetOutput(new LoggerWriterOutputConfig(outputName: "root")))
+                 .WriteTo.SetFinalizeAction(context => Log.Logger.Information("Finalized"))
                  .CreateWorkBook(workbookName: "test");
 
             using (TestCorrelator.CreateContext())
@@ -78,38 +79,29 @@ namespace Tests
 
         [Test]
 
-        public void ReadZipXMindBookFromFileSystem_Success()
+        public void CreateWorkBook_ReadZippedXMindBookFromFileSystem_Success()
         {
-            //TODO: change fluent configuration
+
             //Arrange
             var book = new XMindConfiguration()
-                .WriteTo.SetFinalizeAction(FileWriterUtils.ZipXMindFolder("build.xmind"))
-                .Writers(
-                    new List<IXMindWriter>{
-                        new FileWriter()
-                            .SetOutput(new FileWriterOutputConfig(_files[0])
-                                .SetBasePath(Path.Combine(_customOutputFolderName, "META-INF"))),
-                        new FileWriter()
-                            .SetOutput(new FileWriterOutputConfig(_files[1]).SetBasePath(_customOutputFolderName)),
-                        new FileWriter()
-                            .SetOutput(new FileWriterOutputConfig(_files[2]).SetBasePath(_customOutputFolderName))
-                    })
-                .WriteTo.SetWriterBinding(
-                    //selected based on OutPutName in IXMindWriterOutputConfig
-                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{
-                        FileWriterUtils.ResolveManifestFile,
-                        FileWriterUtils.ResolveMetaFile,
-                        FileWriterUtils.ResolveContentFile
-                    }
-                ).CreateWorkBook(workbookName: "test");
-            book.Save();
+                .SetUpXMindWithFileWriter(basePath: _customOutputFolderName, zip: true)
+                .CreateWorkBook(workbookName: "test");
 
+            var writer = (InMemoryWriter)new InMemoryWriter()
+            .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
             var book2 = new XMindConfiguration()
-                .CreateWorkBook(workbookName: "test2", fileName:"test-output//build.xmind");
+                 .WriteTo
+                 .Writer(writer)
+                 .CreateWorkBook(sourceFileName: Path.Combine(_customOutputFolderName, "build.xmind"), workbookName: "test2");
+            //Act
+            book.Save();
+            book2.Save();
             //Assert
-            
-            //TODO: assertion for XDocuments
+            writer.DocumentStorage.Keys.Should().NotBeEmpty().And
+                .HaveCount(3).And
+                .BeEquivalentTo("manifest.xml", "meta.xml", "content.xml");
         }
+
         [OneTimeTearDown]
         public void Cleanup()
         {

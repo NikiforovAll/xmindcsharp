@@ -8,7 +8,7 @@ namespace XMindAPI.Extensions
     {
         public static XMindConfiguration SetUpXMindWithFileWriter(
             this XMindConfiguration config,
-            bool defaultSettings = true,
+            string basePath = null,
             bool zip = false)
         {
             var standardWriters = new List<FileWriterStandardOutput>{
@@ -16,13 +16,27 @@ namespace XMindAPI.Extensions
                 FileWriterStandardOutput.Meta,
                 FileWriterStandardOutput.Content
             };
-            var result = config.WriteTo.Writers(FileWriterFactory.CreateWriters(standardWriters))
-                .WriteTo.SetWriterBinding(FileWriterFactory.CreateResolvers(standardWriters));
-            if(zip)
+            var result = config
+                .WriteTo
+                    .Writers(FileWriterFactory.CreateWriters(standardWriters, basePath))
+                .WriteTo
+                    .SetWriterBinding(FileWriterFactory.CreateResolvers(standardWriters));
+            if (zip)
             {
-                result.WriteTo.SetFinalizeAction(FileWriterUtils.ZipXMindFolder("build.xmind"));
+                result.WriteTo
+                    .SetFinalizeAction(
+                        FileWriterUtils.ZipXMindFolder("build.xmind", basePath)
+                    );
             }
             return result;
         }
+        public static XMindConfiguration SetUpXMindWithFileWriter(
+            this XMindConfiguration config,
+            bool useDefaultPath,
+            bool zip = false)
+        {
+            return config.SetUpXMindWithFileWriter(basePath: null, zip: zip);
+        }
+
     }
 }

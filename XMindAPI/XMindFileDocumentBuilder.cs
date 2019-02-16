@@ -58,7 +58,7 @@ namespace XMindAPI
         /// <param name="fileName">file name path </param>
         private void Load(string fileName)
         {
-            if (String.IsNullOrEmpty(fileName) || File.Exists(fileName))
+            if (String.IsNullOrEmpty(fileName) || !File.Exists(fileName))
             {
                 throw new InvalidOperationException("XMind file is not loaded");
             }

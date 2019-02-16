@@ -26,31 +26,22 @@ namespace XMindAPI.Writers.Util
             return writerFound;
         }
 
-        public static Action<List<XMindWriterContext>> ZipXMindFolder(string xmindFileName)
+        public static Action<List<XMindWriterContext>> ZipXMindFolder(string xmindFileName, string basePath = null)
         {
             var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+            if (basePath == null)
+            {
+                basePath = xMindSettings["output:base"];
+            }
             var filesToZipLabels = XMindConfigurationCache
                 .Configuration
                 .GetOutputFilesDefinitions()
                 .Values;
-
-            // var fileNames = filesToZipLabels.Select(label => xMindSettings[label]).ToList();
-
-            // var filesToZip = xMindSettings.GetSection("output:files")
-            // .GetChildren().Where(
-            //     x => fileNames
-            //             .Contains(
-            //                 x.GetChildren()
-            //                     .Where(el => el.Key == "name").Select(el => el.Value).FirstOrDefault()
-            //             )
-            //         )
-            //         .Select(x => (File: x["name"], Path: x["location"]))
-            //         .ToList();
             return ctx =>
             {
 
                 using (ZipStorer zip = ZipStorer.Create(
-                        Path.Combine(xMindSettings["output:base"], xmindFileName), string.Empty)
+                        Path.Combine(basePath, xmindFileName), string.Empty)
                     )
                 {
                     var filesToZip = XMindConfigurationCache
@@ -60,16 +51,13 @@ namespace XMindAPI.Writers.Util
                     {
                         var fullPath = Path.Combine(
                             Environment.CurrentDirectory,
-                            XMindConfigurationCache.Configuration.XMindConfigCollection["output:base"],
+                            basePath,
                             fileToken.Value,
                             fileToken.Key
                         );
 
                         zip.AddFile(ZipStorer.Compression.Deflate, fullPath, fileToken.Key, string.Empty);
                     }
-                    // zip.AddFile(ZipStorer.Compression.Deflate, "META-INF\\manifest.xml", "manifest.xml", string.Empty);
-                    // zip.AddFile(ZipStorer.Compression.Deflate, "meta.xml", "meta.xml", string.Empty);
-                    // zip.AddFile(ZipStorer.Compression.Deflate, "content.xml", "content.xml", string.Empty);
                 }
             };
         }

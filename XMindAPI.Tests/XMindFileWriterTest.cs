@@ -20,7 +20,7 @@ namespace Tests
         private readonly string _customOutputFolderName = "custom-output";
         private readonly string _xmindOutputFolderName = "xmind-output";
         private readonly string[] _files = { "manifest.xml", "meta.xml", "content.xml" };
-        private readonly bool _isCleanUpNeeded = false;
+        private readonly bool _isCleanUpNeeded = true;
 
         [SetUp]
         public void Setup()
@@ -67,14 +67,15 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(defaultSettings: true)
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();
             //Assert
             DirectoryInfo di = new DirectoryInfo(_xmindOutputFolderName);
             di.GetFileSystemInfos("*.xml")
-                .Select(fi => fi.Should().BeOfType<FileInfo>().Which.Name.Should().BeOneOf(_files))
+                .Select(fi => fi.Should().BeOfType<FileInfo>().Which.Name
+                .Should().BeOneOf(_files))
                 .All(x => true);
         }
         [Test]
@@ -82,7 +83,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(defaultSettings: true, zip: true)
+                .SetUpXMindWithFileWriter(useDefaultPath:true,zip: true)
                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();

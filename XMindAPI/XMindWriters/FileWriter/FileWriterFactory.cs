@@ -2,42 +2,58 @@ using System;
 using System.Collections.Generic;
 using XMindAPI.Writers.Util;
 using System.Linq;
+using static XMindAPI.XMindConfigurationCache;
 namespace XMindAPI.Writers
 {
     public class FileWriterFactory
     {
 
-        public static List<IXMindWriter> CreateWriters(IEnumerable<FileWriterStandardOutput> standardOutputs)
+        public static List<IXMindWriter> CreateWriters(IEnumerable<FileWriterStandardOutput> standardOutputs, string basePath)
         {
-           return standardOutputs.Select(o => CreateWriterFactoryMethod(o)).ToList();
+            return standardOutputs.Select(o => CreateWriterFactoryMethod(o, basePath)).ToList();
         }
         public static List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>> CreateResolvers(IEnumerable<FileWriterStandardOutput> standardOutputs)
         {
-           return standardOutputs.Select(o => CreateResolverFactoryMethod(o)).ToList();
+            return standardOutputs.Select(o => CreateResolverFactoryMethod(o)).ToList();
         }
-        public static IXMindWriter CreateWriterFactoryMethod(FileWriterStandardOutput standardOutputType)
+        public static IXMindWriter CreateWriterFactoryMethod(FileWriterStandardOutput standardOutputType, string basePath)
         {
             var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+            string fileName = null;
+            bool useDefaultPath = basePath == null;
             IXMindWriter result;
             switch (standardOutputType)
             {
+
                 case FileWriterStandardOutput.Manifest:
-                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings[XMindConfigurationCache.ManifestLabel], true));
+                    fileName = xMindSettings[ManifestLabel];
                     break;
                 case FileWriterStandardOutput.Meta:
-                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings[XMindConfigurationCache.MetaLabel], true));
+                    fileName = xMindSettings[MetaLabel];
                     break;
                 case FileWriterStandardOutput.Content:
-                    result = new FileWriter().SetOutput(new FileWriterOutputConfig(xMindSettings[XMindConfigurationCache.ContentLabel], true));
+                    fileName = xMindSettings[ContentLabel];
                     break;
                 default:
                     result = null;
                     break;
             }
-            if (result == null)
+            if (fileName == null)
             {
                 throw new InvalidOperationException("CreateWriterFactoryMethod haven't assigned writer");
             }
+            var writerConfig = new FileWriterOutputConfig(
+                fileName,
+                useDefaultPath
+            );
+            if(!useDefaultPath)
+            {
+                var xmindDefaultFileLocation = XMindConfigurationCache.Configuration.GetOutputFilesLocations()[fileName];
+                writerConfig.SetBasePath(
+                    System.IO.Path.Combine(basePath, xmindDefaultFileLocation)
+                );
+            }
+            result = new FileWriter().SetOutput(writerConfig);
             return result;
         }
 

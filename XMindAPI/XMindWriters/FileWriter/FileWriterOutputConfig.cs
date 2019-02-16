@@ -9,7 +9,7 @@ namespace XMindAPI.Writers
     public class FileWriterOutputConfig : IXMindWriterOutputConfig
     {
         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
-
+        private readonly bool _useDefaultPath;
         private string _path;
         public string Path { get => _path; private set => _path = value; }
         public string OutputName { get; set; }
@@ -19,6 +19,11 @@ namespace XMindAPI.Writers
             OutputName = outputName;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="outputName">name of the file</param>
+        /// <param name="useDefaultPath">build Path based on xmindsettings.json file, basePath (output:base) and file location (output:files:[outputname]) is used</param>
         public FileWriterOutputConfig(string outputName, bool useDefaultPath):this(outputName)
         {
             if(useDefaultPath){
@@ -31,14 +36,17 @@ namespace XMindAPI.Writers
                     Path = System.IO.Path.Combine(basePath, path);
                 }
             }
+
+            this._useDefaultPath = useDefaultPath;
         }
 
         public IXMindWriterOutputConfig SetBasePath(string path)
         {
-            // TODO: probably good idea to use this logic across all IXMindWriters
-            if (!String.IsNullOrEmpty(Path))
+            if (this._useDefaultPath){
+                throw new InvalidOperationException("Not possible to assign new path, default path in use because of FileWriterOutputConfig.useDefaultPath");
+            }
+            if(Path != null)
             {
-                //TODO: consider to use INotifyPropertyChanged for this side effect
                 Logger.Warn($"IXMindWriterOutputConfig.Path was overridden: oldValue:{Path}, newValue: {path}");
             }
             Path = path;
