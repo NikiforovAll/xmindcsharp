@@ -1,53 +1,89 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
 using XMindAPI.Logging;
-
+using System.Linq;
 namespace XMindAPI
 {
-    internal class XMindDocumentBuilder
+    internal class XMindDocumentBuilder : IXMindDocumentBuilder
     {
-         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
-         private readonly IConfiguration _xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+        protected readonly IConfiguration xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+
+        protected XDocument manifestData = null;
+        protected XDocument metaData = null;
+        protected XDocument contentData = null;
+
+        public XDocument MetaFile { get => metaData; }
+        public XDocument ManifestFile { get => manifestData;}
+        public XDocument ContentFile { get => contentData; }
+
         public XMindDocumentBuilder()
         {
         }
-        public XDocument CreateDefaultMetaFile()
+        public virtual XDocument CreateMetaFile()
+        {
+            this.metaData = CreateDefaultMetaFile();
+            return this.metaData;
+        }
+
+        public virtual XDocument CreateManifestFile()
+        {
+            this.manifestData = CreateDefaultManifestFile();
+            return this.manifestData;
+        }
+
+        public virtual XDocument CreateContentFile()
+        {
+            this.contentData = CreateDefaultContentFile();
+            return this.contentData;
+        }
+
+        private XDocument CreateDefaultMetaFile()
         {
             XDocument metaFile = new XDocument();
             metaFile.Declaration = new XDeclaration("1.0", "UTF-8", "no");
             metaFile.Add(
                 new XElement(
-                    XNamespace.Get(_xMindSettings["metaNamespace"]) + "meta",
+                    XNamespace.Get(xMindSettings["metaNamespace"]) + "meta",
                     new XAttribute("version", "2.0")
                 )
             );
             return metaFile;
         }
 
-        public XDocument CreateDefaultManifestFile()
+        private XDocument CreateDefaultManifestFile()
         {
+            var files = XMindConfigurationCache
+                .Configuration
+                .GetOutputFilesDefinitions();
+            var fileLocations = XMindConfigurationCache
+                .Configuration
+                .GetOutputFilesLocations();
             var manifest = new XDocument();
             manifest.Declaration = new XDeclaration("1.0", "UTF-8", "no");
-            var manifestNamespace = XNamespace.Get(_xMindSettings["manifestNamespace"]);
+            var manifestNamespace = XNamespace.Get(xMindSettings["manifestNamespace"]);
             var manifestFileEntryToken = manifestNamespace + "file-entry";
             XElement rootElement = new XElement(manifestNamespace + "manifest");
             rootElement.Add(
                 new XElement(manifestFileEntryToken,
-                    new XAttribute("full-path", "content.xml"),
+                    new XAttribute("full-path", files[XMindConfigurationCache.ContentLabel]),
                     new XAttribute("media-type", "text/xml")
                 ));
 
+            var manifestFileName = files[XMindConfigurationCache.ManifestLabel];
+            var manifestFilePath = fileLocations[manifestFileName];
             rootElement.Add(
                 new XElement(manifestFileEntryToken,
-                    new XAttribute("full-path", "META-INF/"),
+                    new XAttribute("full-path", manifestFilePath),
                     new XAttribute("media-type", "")
                 ));
 
             rootElement.Add(
                 new XElement(manifestFileEntryToken,
-                    new XAttribute("full-path", "META-INF/manifest.xml"),
+                    new XAttribute("full-path", Path.Combine(manifestFilePath, manifestFileName)),
                     new XAttribute("media-type", "text/xml")
                 ));
 
@@ -61,19 +97,19 @@ namespace XMindAPI
             return manifest;
         }
 
-        public XDocument CreateDefaultContentFile()
+        private XDocument CreateDefaultContentFile()
         {
             var content = new XDocument();
-            XNamespace ns2 = XNamespace.Get(_xMindSettings["standardContentNamespaces:xsl"]);
-            XNamespace ns3 = XNamespace.Get(_xMindSettings["standardContentNamespaces:svg"]);
-            XNamespace ns4 = XNamespace.Get(_xMindSettings["standardContentNamespaces:xhtml"]);
+            XNamespace ns2 = XNamespace.Get(xMindSettings["standardContentNamespaces:xsl"]);
+            XNamespace ns3 = XNamespace.Get(xMindSettings["standardContentNamespaces:svg"]);
+            XNamespace ns4 = XNamespace.Get(xMindSettings["standardContentNamespaces:xhtml"]);
 
             content.Add(new XElement(
-                XNamespace.Get(_xMindSettings["contentNamespace"]) + "xmap-content",
+                XNamespace.Get(xMindSettings["contentNamespace"]) + "xmap-content",
                 new XAttribute(XNamespace.Xmlns + "fo", ns2),
                 new XAttribute(XNamespace.Xmlns + "svg", ns3),
                 new XAttribute(XNamespace.Xmlns + "xhtml", ns4),
-                new XAttribute(XNamespace.Xmlns + "xlink", XNamespace.Get(_xMindSettings["xlinkNamespace"])),
+                new XAttribute(XNamespace.Xmlns + "xlink", XNamespace.Get(xMindSettings["xlinkNamespace"])),
                 new XAttribute("version", "2.0")
             ));
             return content;

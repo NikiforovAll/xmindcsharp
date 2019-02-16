@@ -10,11 +10,19 @@ using XMindAPI;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
 using FluentAssertions;
+using XMindAPI.Writers.Util;
+using XMindAPI.Extensions;
+
 namespace Tests
 {
     [TestFixture]
     public class XMindWorkBookTest
     {
+
+        private readonly string _customOutputFolderName = Path.Combine(Path.GetTempPath(), "test-output");
+        private readonly string[] _files = { "manifest.xml", "meta.xml", "content.xml" };
+        private readonly bool _isCleanUpNeeded = false;
+
         [SetUp]
         public void Setup()
         {
@@ -30,12 +38,11 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                 .WriteTo
-                 .SetFinalizeAction(context => Log.Logger.Information("Finalized"))
-                 .Writer(new LoggerWriter()
+                 .WriteTo.Writer(new LoggerWriter()
                          .SetOutput(new LoggerWriterOutputConfig(outputName: "root")))
+                 .WriteTo.SetFinalizeAction(context => Log.Logger.Information("Finalized"))
                  .CreateWorkBook(workbookName: "test");
-            
+
             using (TestCorrelator.CreateContext())
             {
                 //Act
@@ -55,7 +62,7 @@ namespace Tests
         [Test]
         public void Save_CreateEmptyBookWithInMemoryWriter_Success()
         {
-            var writer = (InMemoryWriter) new InMemoryWriter()
+            var writer = (InMemoryWriter)new InMemoryWriter()
                 .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
             //Arrange
             var book = new XMindConfiguration()
@@ -68,6 +75,42 @@ namespace Tests
             writer.DocumentStorage.Keys.Should().NotBeEmpty().And
                 .HaveCount(3).And
                 .BeEquivalentTo("manifest.xml", "meta.xml", "content.xml");
+        }
+
+        [Test]
+
+        public void CreateWorkBook_ReadZippedXMindBookFromFileSystem_Success()
+        {
+
+            //Arrange
+            var book = new XMindConfiguration()
+                .SetUpXMindWithFileWriter(basePath: _customOutputFolderName, zip: true)
+                .CreateWorkBook(workbookName: "test");
+
+            var writer = (InMemoryWriter)new InMemoryWriter()
+            .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
+            book.Save();
+            var book2 = new XMindConfiguration()
+                 .WriteTo
+                 .Writer(writer)
+                 .CreateWorkBook(sourceFileName: Path.Combine(_customOutputFolderName, "build.xmind"), workbookName: "test2");
+            //Act
+            book2.Save();
+            //Assert
+            writer.DocumentStorage.Keys.Should().NotBeEmpty().And
+                .HaveCount(3).And
+                .BeEquivalentTo("manifest.xml", "meta.xml", "content.xml");
+        }
+
+        [OneTimeTearDown]
+        public void Cleanup()
+        {
+            if (_isCleanUpNeeded)
+            {
+                var customOutput = new DirectoryInfo(_customOutputFolderName);
+                if (customOutput.Exists)
+                    customOutput.Delete(true);
+            }
         }
     }
 }

@@ -48,10 +48,10 @@ namespace XMindAPI.Writers.Configuration
             return _xMindConfiguration;
         }
 
-        public XMindWriterConfiguration SetFinalizeAction(Action<List<XMindWriterContext>> action)
+        public XMindConfiguration SetFinalizeAction(Action<List<XMindWriterContext>> action)
         {
             FinalizeAction = action;
-            return this;
+            return _xMindConfiguration;
         }
 
         internal List<IXMindWriter> ResolveWriters(XMindWriterContext context)

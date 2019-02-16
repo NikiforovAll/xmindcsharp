@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.IO.Compression;
-using System.Collections.Generic;
 
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
+using XMindAPI.Logging;
 
 namespace XMindAPI
 {
@@ -18,40 +18,28 @@ namespace XMindAPI
     /// </summary>
     public class XMindWorkBook
     {
-        private string _fileName = null;
+        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         private readonly XMindConfiguration _globalConfiguration;
-        private XDocument _manifestData = null;
-        private XDocument _metaData = null;
-        private XDocument _contentData = null;
-        private XNamespace _defaultContentNS = null;
-        private XNamespace _defaultManifestNS = null;
-        private XNamespace _defaultMetaNS = null;
-        private XNamespace _xlinkNS = null;
-
+        private readonly IXMindDocumentBuilder _documentBuilder;
         internal readonly XMindConfigurationCache _xMindSettings;
+        
+
+        // private string _fileName = null;
+        
 
         /// <summary>
         /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
         /// </summary>
-        /// <param name="fileName">XMind file to create / load</param>
-        /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
-        internal XMindWorkBook(string fileName, bool loadContent, XMindConfiguration globalConfiguration, XMindConfigurationCache config)
+        // /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
+        internal XMindWorkBook(XMindConfiguration globalConfiguration, XMindConfigurationCache config, IXMindDocumentBuilder builder)
         {
-            _fileName = fileName;
             _xMindSettings = config;
-            this._globalConfiguration = globalConfiguration;
-            if (loadContent)
-            {
-                Load();
-            }
-            else
-            {
-                var builder = new XMindDocumentBuilder();
-                _metaData = builder.CreateDefaultMetaFile();
-                _manifestData = builder.CreateDefaultManifestFile();
-                _contentData = builder.CreateDefaultContentFile();
-
-            }
+            _globalConfiguration = globalConfiguration;
+            _documentBuilder = builder;
+            _documentBuilder.CreateMetaFile();
+            _documentBuilder.CreateManifestFile();
+            _documentBuilder.CreateContentFile();
+            //TODO: use builder in order to work with XDocuments, ideally get rid of XML namespace in workbook
         }
 
         public List<XMindSheet> GetSheetInfo()
@@ -95,13 +83,13 @@ namespace XMindAPI
         public string AddSheet(string sheetName)
         {
             string sheetId = NewId();
-
-            _contentData.Root.Add(
-                new XElement(_defaultContentNS + "sheet",
-                    new XAttribute("id", sheetId),
-                    new XAttribute("timestamp", GetTimeStamp()),
-                    new XElement(_defaultContentNS + "title", sheetName)
-                    ));
+            //TODO: 
+            // _contentData.Root.Add(
+            //     new XElement(_defaultContentNS + "sheet",
+            //         new XAttribute("id", sheetId),
+            //         new XAttribute("timestamp", GetTimeStamp()),
+            //         new XElement(_defaultContentNS + "title", sheetName)
+            //         ));
 
             return sheetId;
         }
@@ -147,17 +135,17 @@ namespace XMindAPI
             }
 
             string topicId = NewId();
+            //TODO: 
+            // var enumField = structure.GetType().GetFields().Where(field => field.Name == structure.ToString()).FirstOrDefault();
+            // DescriptionAttribute[] a = (DescriptionAttribute[])enumField.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
-            var enumField = structure.GetType().GetFields().Where(field => field.Name == structure.ToString()).FirstOrDefault();
-            DescriptionAttribute[] a = (DescriptionAttribute[])enumField.GetCustomAttributes(typeof(DescriptionAttribute), false);
-
-            sheet.Add(
-                new XElement(_defaultContentNS + "topic",
-                    new XAttribute("id", topicId),
-                    new XAttribute("structure-class", a[0].Description),
-                    new XAttribute("timestamp", GetTimeStamp()),
-                    new XElement(_defaultContentNS + "title", topicName)
-                    ));
+            // sheet.Add(
+            //     new XElement(_defaultContentNS + "topic",
+            //         new XAttribute("id", topicId),
+            //         new XAttribute("structure-class", a[0].Description),
+            //         new XAttribute("timestamp", GetTimeStamp()),
+            //         new XElement(_defaultContentNS + "title", topicName)
+            //         ));
 
             return topicId;
         }
@@ -181,42 +169,42 @@ namespace XMindAPI
 
             // Get topic children tag, if not exist create:
             XElement children = parent.Descendants().Where(w => w.Name.ToString().EndsWith("children")).FirstOrDefault();
+            //TODO:
+            // if (children == null)
+            // {
+            //     children = new XElement(_defaultContentNS + "children");
+            //     parent.Add(children);
+            // }
 
-            if (children == null)
-            {
-                children = new XElement(_defaultContentNS + "children");
-                parent.Add(children);
-            }
+            // // Get topics tag, if not exists create:
+            // XElement topics = children.Descendants().Where(w => w.Name.ToString().EndsWith("topics")).FirstOrDefault();
 
-            // Get topics tag, if not exists create:
-            XElement topics = children.Descendants().Where(w => w.Name.ToString().EndsWith("topics")).FirstOrDefault();
+            // if (topics == null)
+            // {
+            //     topics = new XElement(_defaultContentNS + "topics",
+            //         new XAttribute("type", "attached"));
+            //     children.Add(topics);
+            // }
 
-            if (topics == null)
-            {
-                topics = new XElement(_defaultContentNS + "topics",
-                    new XAttribute("type", "attached"));
-                children.Add(topics);
-            }
+            // // Add new topic to topics element:
+            // string topicId = NewId();
+            // XElement topicElement = new XElement(_defaultContentNS + "topic",
+            //         new XAttribute("id", topicId),
+            //         new XAttribute("timestamp", GetTimeStamp()),
+            //         new XElement(_defaultContentNS + "title", topicName)
+            //         );
 
-            // Add new topic to topics element:
-            string topicId = NewId();
-            XElement topicElement = new XElement(_defaultContentNS + "topic",
-                    new XAttribute("id", topicId),
-                    new XAttribute("timestamp", GetTimeStamp()),
-                    new XElement(_defaultContentNS + "title", topicName)
-                    );
+            // if (structure != null)
+            // {
+            //     var enumField = structure.GetType().GetFields().Where(field => field.Name == structure.ToString()).FirstOrDefault();
+            //     DescriptionAttribute[] a = (DescriptionAttribute[])enumField.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
-            if (structure != null)
-            {
-                var enumField = structure.GetType().GetFields().Where(field => field.Name == structure.ToString()).FirstOrDefault();
-                DescriptionAttribute[] a = (DescriptionAttribute[])enumField.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            //     topicElement.Add(new XAttribute("structure-class", a[0].Description));
+            // }
 
-                topicElement.Add(new XAttribute("structure-class", a[0].Description));
-            }
+            // topics.Add(topicElement);
 
-            topics.Add(topicElement);
-
-            return topicId;
+            return null;//topicId;
         }
 
         /// <summary>
@@ -243,26 +231,26 @@ namespace XMindAPI
             {
                 throw new InvalidOperationException("Topic not found!");
             }
-
+            //TODO:
             // Get topic labels tag, if not exist create:
-            XElement labels = topic.Descendants().Where(w => w.Name.ToString().EndsWith("labels")).FirstOrDefault();
+            // XElement labels = topic.Descendants().Where(w => w.Name.ToString().EndsWith("labels")).FirstOrDefault();
 
-            if (labels == null)
-            {
-                labels = new XElement(_defaultContentNS + "labels");
-                topic.Add(labels);
-            }
+            // if (labels == null)
+            // {
+            //     labels = new XElement(_defaultContentNS + "labels");
+            //     topic.Add(labels);
+            // }
 
-            // Get topic label tag, if not exist create:
-            XElement label = labels.Descendants().Where(w => w.Name.ToString().EndsWith("label")).FirstOrDefault();
+            // // Get topic label tag, if not exist create:
+            // XElement label = labels.Descendants().Where(w => w.Name.ToString().EndsWith("label")).FirstOrDefault();
 
-            if (label == null)
-            {
-                label = new XElement(_defaultContentNS + "label");
-                labels.Add(label);
-            }
+            // if (label == null)
+            // {
+            //     label = new XElement(_defaultContentNS + "label");
+            //     labels.Add(label);
+            // }
 
-            label.Value = labelText;
+            // label.Value = labelText;
         }
 
         /// <summary>
@@ -272,42 +260,43 @@ namespace XMindAPI
         /// <param name="marker">Marker type. Refer XMindMarkers enum</param>
         public void AddMarker(string topicId, XMindMarkers marker)
         {
-            XElement topic = GetTopic(topicId);
+            // TODO:
+            // XElement topic = GetTopic(topicId);
 
-            if (topic == null)
-            {
-                throw new InvalidOperationException("Topic not found!");
-            }
+            // if (topic == null)
+            // {
+            //     throw new InvalidOperationException("Topic not found!");
+            // }
 
-            // Get topic marker-refs tag, if not exist create:
-            XElement marker_refs = topic.Descendants().Where(w => w.Name.ToString().EndsWith("marker-refs")).FirstOrDefault();
+            // // Get topic marker-refs tag, if not exist create:
+            // XElement marker_refs = topic.Descendants().Where(w => w.Name.ToString().EndsWith("marker-refs")).FirstOrDefault();
 
-            if (marker_refs == null)
-            {
-                marker_refs = new XElement(_defaultContentNS + "marker-refs");
-                topic.Add(marker_refs);
-            }
+            // if (marker_refs == null)
+            // {
+            //     marker_refs = new XElement(_defaultContentNS + "marker-refs");
+            //     topic.Add(marker_refs);
+            // }
 
-            // Get topic marker_ref tag, if not exist create:
-            XElement marker_ref = marker_refs.Descendants().Where(w => w.Name.ToString().EndsWith("marker-ref")).FirstOrDefault();
+            // // Get topic marker_ref tag, if not exist create:
+            // XElement marker_ref = marker_refs.Descendants().Where(w => w.Name.ToString().EndsWith("marker-ref")).FirstOrDefault();
 
-            if (marker_ref == null)
-            {
-                marker_ref = new XElement(_defaultContentNS + "marker-ref");
-                marker_refs.Add(marker_ref);
-            }
+            // if (marker_ref == null)
+            // {
+            //     marker_ref = new XElement(_defaultContentNS + "marker-ref");
+            //     marker_refs.Add(marker_ref);
+            // }
 
-            XAttribute att = marker_ref.Attributes().Where(w => w.Name == "marker-id").FirstOrDefault();
+            // XAttribute att = marker_ref.Attributes().Where(w => w.Name == "marker-id").FirstOrDefault();
 
-            if (att != null)
-            {
-                marker_ref.Attributes("marker-id").Remove();
-            }
+            // if (att != null)
+            // {
+            //     marker_ref.Attributes("marker-id").Remove();
+            // }
 
-            var enumField = marker.GetType().GetFields().Where(field => field.Name == marker.ToString()).FirstOrDefault();
-            DescriptionAttribute[] a = (DescriptionAttribute[])enumField.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            // var enumField = marker.GetType().GetFields().Where(field => field.Name == marker.ToString()).FirstOrDefault();
+            // DescriptionAttribute[] a = (DescriptionAttribute[])enumField.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
-            marker_ref.Add(new XAttribute("marker-id", a[0].Description));
+            // marker_ref.Add(new XAttribute("marker-id", a[0].Description));
         }
 
         /// <summary>
@@ -318,25 +307,25 @@ namespace XMindAPI
         public void AddTopicLink(string topicId, string linkToTopicId)
         {
             XElement topic = GetTopic(topicId);
+            //TODO:
+            // if (topic == null)
+            // {
+            //     throw new InvalidOperationException("Topic not found!");
+            // }
 
-            if (topic == null)
-            {
-                throw new InvalidOperationException("Topic not found!");
-            }
+            // if (GetTopic(linkToTopicId) == null)
+            // {
+            //     throw new InvalidOperationException("Link to topic not found!");
+            // }
 
-            if (GetTopic(linkToTopicId) == null)
-            {
-                throw new InvalidOperationException("Link to topic not found!");
-            }
+            // XAttribute att = topic.Attributes().Where(w => w.Name == _xlinkNS + "href").FirstOrDefault();
 
-            XAttribute att = topic.Attributes().Where(w => w.Name == _xlinkNS + "href").FirstOrDefault();
+            // if (att != null)
+            // {
+            //     topic.Attributes(_xlinkNS + "href").Remove();
+            // }
 
-            if (att != null)
-            {
-                topic.Attributes(_xlinkNS + "href").Remove();
-            }
-
-            topic.Add(new XAttribute(_xlinkNS + "href", "xmind:#" + linkToTopicId));
+            // topic.Add(new XAttribute(_xlinkNS + "href", "xmind:#" + linkToTopicId));
         }
 
         /// <summary>
@@ -345,6 +334,7 @@ namespace XMindAPI
         /// <param name="topicId">Topic to collapse child structure</param>
         public void CollapseChildren(string topicId)
         {
+            //TODO:
             XElement topic = GetTopic(topicId);
 
             if (topic == null)
@@ -369,13 +359,14 @@ namespace XMindAPI
         /// <param name="newTitle">New title</param>
         public void EditTopicTitle(string topicId, string newTitle)
         {
-            XElement topic = GetTopic(topicId);
+            //TODO:
+            // XElement topic = GetTopic(topicId);
 
-            if (topic != null)
-            {
-                XElement titleElement = topic.Descendants().Where(w => w.Name.ToString().EndsWith("title")).First();
-                titleElement.Value = newTitle;
-            }
+            // if (topic != null)
+            // {
+            //     XElement titleElement = topic.Descendants().Where(w => w.Name.ToString().EndsWith("title")).First();
+            //     titleElement.Value = newTitle;
+            // }
         }
 
         /// <summary>
@@ -385,6 +376,7 @@ namespace XMindAPI
         /// <returns>Topic title</returns>
         public string GetTopicTitle(string topicId)
         {
+            //TODO:
             string title = null;
             XElement topic = GetTopic(topicId);
 
@@ -403,6 +395,7 @@ namespace XMindAPI
         /// <returns>List of topic titles found</returns>
         public List<string> GetTopicIdsByTitle(string title)
         {
+            //TODO:
             List<string> topicsFound = new List<string>();
 
             foreach (XElement sheet in GetSheets())
@@ -421,6 +414,7 @@ namespace XMindAPI
         /// <returns>List of topic titles found</returns>
         public List<string> GetTopicIdsByTitle(string sheetId, string title)
         {
+            //TODO:
             List<string> topicsFound = new List<string>();
 
             XElement sheet = GetSheet(sheetId);
@@ -443,6 +437,7 @@ namespace XMindAPI
         /// <returns>List of topic id's where the user tag/value matches</returns>
         public List<string> GetTopicIdsByUserTagValue(string tagName, string searchValue)
         {
+            //TODO:
             List<string> topicsFound = new List<string>();
 
             foreach (XElement sheet in GetSheets())
@@ -476,34 +471,34 @@ namespace XMindAPI
             {
                 item = GetTopic(itemId);
             }
+            //TODO:
+            // if (item == null)
+            // {
+            //     throw new InvalidOperationException("Topic/Sheet not found!");
+            // }
 
-            if (item == null)
-            {
-                throw new InvalidOperationException("Topic/Sheet not found!");
-            }
+            // // Get user tags, if not exist create:
+            // XElement userTags = item.Descendants().Where(w => w.Name.ToString().EndsWith("UserTags")).FirstOrDefault();
 
-            // Get user tags, if not exist create:
-            XElement userTags = item.Descendants().Where(w => w.Name.ToString().EndsWith("UserTags")).FirstOrDefault();
+            // if (userTags == null)
+            // {
+            //     userTags = new XElement(_defaultContentNS + "UserTags");
+            //     item.Add(userTags);
+            // }
 
-            if (userTags == null)
-            {
-                userTags = new XElement(_defaultContentNS + "UserTags");
-                item.Add(userTags);
-            }
+            // // Get the named user tag, if not exist create:
+            // XElement userTag = userTags.Descendants()
+            //     .Where(w => w.Name.ToString().EndsWith("UserTag") && GetAttribValue(w, "TagName") == tagName).FirstOrDefault();
 
-            // Get the named user tag, if not exist create:
-            XElement userTag = userTags.Descendants()
-                .Where(w => w.Name.ToString().EndsWith("UserTag") && GetAttribValue(w, "TagName") == tagName).FirstOrDefault();
+            // if (userTag == null)
+            // {
+            //     userTag = new XElement(_defaultContentNS + "UserTag",
+            //         new XAttribute("TagName", tagName),
+            //         new XAttribute("TagValue", ""));
+            //     userTags.Add(userTag);
+            // }
 
-            if (userTag == null)
-            {
-                userTag = new XElement(_defaultContentNS + "UserTag",
-                    new XAttribute("TagName", tagName),
-                    new XAttribute("TagValue", ""));
-                userTags.Add(userTag);
-            }
-
-            userTag.SetAttributeValue(XName.Get("TagValue"), tagValue);
+            // userTag.SetAttributeValue(XName.Get("TagValue"), tagValue);
         }
 
         /// <summary>
@@ -514,6 +509,7 @@ namespace XMindAPI
         /// <returns>List of user tag values that was found</returns>
         public List<string> GetUserTagValues(string itemId, string tagName)
         {
+            //TODO:
             List<string> tagValues = new List<string>();
 
             // Check if itemId is a sheet:
@@ -553,15 +549,15 @@ namespace XMindAPI
         /// </summary>
         public void Save()
         {
-            var manifestFileName = _xMindSettings.XMindConfigCollection["output:definition:manifest"];
-            var metaFileName = _xMindSettings.XMindConfigCollection["output:definition:meta"];
-            var contentFileName = _xMindSettings.XMindConfigCollection["output:definition:content"];
+            var manifestFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.ManifestLabel];
+            var metaFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.MetaLabel];
+            var contentFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.ContentLabel];
 
             var files = new Dictionary<string, XDocument>(3)
             {
-                [metaFileName] = _metaData,
-                [manifestFileName] = _manifestData,
-                [contentFileName] = _contentData
+                [metaFileName] = _documentBuilder.MetaFile,
+                [manifestFileName] = _documentBuilder.ManifestFile,
+                [contentFileName] = _documentBuilder.ContentFile
             };
 
             var writerContexts = new List<XMindWriterContext>();
@@ -579,32 +575,14 @@ namespace XMindAPI
                 {
                     throw new InvalidOperationException("XMindBook.Save: Writer is not selected");
                 }
-                selectedWriters.ForEach(w => w.WriteToStorage(kvp.Value, kvp.Key));
+
+                foreach (var writer in selectedWriters)
+                {
+                    writer.WriteToStorage(kvp.Value, kvp.Key);
+                }
                 writerContexts.Add(currentWriterContext);
             }
             _globalConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts);
-
-            // if (_fileName == null)
-            // { throw new InvalidOperationException("Nothing to save!"); }
-
-            // String tempPath = Path.GetTempPath() + Guid.NewGuid() + "\\";
-
-            // Directory.CreateDirectory(tempPath);
-            // Directory.CreateDirectory(tempPath + "META-INF");
-            // Directory.CreateDirectory(tempPath + "Thumbnails");
-
-            // File.WriteAllText(tempPath + "META-INF\\manifest.xml", _manifestData.ToString());
-            // File.WriteAllText(tempPath + "meta.xml", _metaData.ToString());
-            // File.WriteAllText(tempPath + "content.xml", _contentData.ToString());
-
-            // using (ZipStorer zip = ZipStorer.Create(_fileName, string.Empty))
-            // {
-            //     zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "META-INF\\manifest.xml", "manifest.xml", string.Empty);
-            //     zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "meta.xml", "meta.xml", string.Empty);
-            //     zip.AddFile(ZipStorer.Compression.Deflate, tempPath + "content.xml", "content.xml", string.Empty);
-            // }
-
-            // Directory.Delete(tempPath, true);
         }
 
 
@@ -616,6 +594,7 @@ namespace XMindAPI
         /// <param name="xmTopic"></param>
         private void GetTopicsRecursively(XElement parent, XMindSheet xmSheet, XMindTopic xmTopic)
         {
+            //TODO:
             foreach (XElement nextLevelTopic in parent.Descendants().Where(w1 => w1.Name.ToString().EndsWith("topic")
                 && GetAttribValue(w1.Parent.Parent.Parent, "id") == GetAttribValue(parent, "id")))
             {
@@ -630,6 +609,7 @@ namespace XMindAPI
 
         private XElement GetSheet(string sheetId)
         {
+            //TODO:
             return GetSheets()
                 .Where(w => GetAttribValue(w, "id") == sheetId)
                 .FirstOrDefault();
@@ -637,14 +617,17 @@ namespace XMindAPI
 
         private List<XElement> GetSheets()
         {
-            return _contentData.Root.Elements()
-                .Where(w => w.Name.ToString()
-                .EndsWith("sheet"))
-                .ToList();
+            //TODO:
+            // return _contentData.Root.Elements()
+            //     .Where(w => w.Name.ToString()
+            //     .EndsWith("sheet"))
+            //     .ToList();
+            return null;
         }
 
         private XElement GetTopic(string topicId)
         {
+            //TODO:
             XElement topic = null;
 
             foreach (XElement sheet in GetSheets())
@@ -661,6 +644,7 @@ namespace XMindAPI
 
         private List<XElement> GetTopics(XElement sheet)
         {
+            //TODO:
             return sheet.Descendants()
                 .Where(w => w.Name.ToString()
                 .EndsWith("topic"))
@@ -669,6 +653,7 @@ namespace XMindAPI
 
         private string GetAttribValue(XElement el, string attributeName)
         {
+            //TODO:
             XAttribute att = el.Attributes(attributeName)
                 .FirstOrDefault();
 
@@ -685,62 +670,8 @@ namespace XMindAPI
 
         private string GetTimeStamp()
         {
+            //TODO: timestamp vs guid
             return DateTime.UtcNow.Ticks.ToString();
         }
-
-        /// <summary>
-        /// Loads an XMind workbook file from disk.
-        /// </summary>
-        private void Load()
-        {
-            if (_fileName == null)
-            { throw new InvalidOperationException("No XMind file to load!"); }
-
-            if (File.Exists(_fileName) == false)
-            { throw new InvalidOperationException("XMind file does not exist!"); }
-
-            FileInfo xMindFileInfo = new FileInfo(_fileName);
-
-            if (xMindFileInfo.Extension.ToLower() != ".xmind")
-            { throw new InvalidOperationException("XMind file extension expected!"); }
-
-            String tempPath = Path.GetTempPath() + Guid.NewGuid() + "\\";
-            Directory.CreateDirectory(tempPath);
-
-            string[] fileNameStrings = xMindFileInfo.Name.Split('.');
-            fileNameStrings[fileNameStrings.Count() - 1] = "zip";
-
-            StringBuilder zipFileNameBuilder = new StringBuilder(string.Empty, 64);
-            foreach (string str in fileNameStrings)
-            {
-                zipFileNameBuilder.Append(str + ".");
-            }
-            string zipFileName = zipFileNameBuilder.ToString().TrimEnd('.');
-
-            // Make a temporary copy of the XMind file with a .zip extention for J# zip libraries:
-            File.Copy(_fileName, tempPath + zipFileName);
-            File.SetAttributes(tempPath + zipFileName, FileAttributes.Normal);  // Make sure the .zip temporary file is not read only - we want to delete it later...
-
-            using (ZipStorer zip = ZipStorer.Open(tempPath + zipFileName, FileAccess.Read))
-            {
-                // Read the central directory collection
-                List<ZipStorer.ZipFileEntry> dir = zip.ReadCentralDir();
-
-                foreach (ZipStorer.ZipFileEntry entry in dir)
-                {
-                    zip.ExtractFile(entry, tempPath +
-                        (entry.FilenameInZip == "manifest.xml" ? "META-INF\\" : "") +
-                        entry.FilenameInZip);
-                }
-                zip.Close();
-            }
-
-            _metaData = XDocument.Parse(File.ReadAllText(tempPath + "meta.xml"));
-            _manifestData = XDocument.Parse(File.ReadAllText(tempPath + "META-INF\\manifest.xml"));
-            _contentData = XDocument.Parse(File.ReadAllText(tempPath + "content.xml"));
-
-            Directory.Delete(tempPath, true);
-        }
-
     }
 }

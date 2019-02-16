@@ -15,14 +15,17 @@ namespace XMindAPI.Configuration
             WriteTo = new XMindWriterConfiguration(this);
         }
 
-        public XMindWorkBook CreateWorkBook(string fileName, bool loadContent)
+        public XMindWorkBook CreateWorkBook(string workbookName, string sourceFileName, bool loadContent = true)
         {
-            return new XMindWorkBook(fileName, loadContent, this, XMindConfigurationCache.Configuration);
+            // could be replaced with factory method
+            IXMindDocumentBuilder builder = loadContent ? new XMindFileDocumentBuilder(sourceFileName): new XMindDocumentBuilder();
+            var workbook = new XMindWorkBook(this, XMindConfigurationCache.Configuration, builder);
+            return workbook;
         }
 
         public XMindWorkBook CreateWorkBook(string workbookName)
         {
-            return CreateWorkBook(workbookName, false);
+            return CreateWorkBook(workbookName, string.Empty, false);
         }
     }
 }

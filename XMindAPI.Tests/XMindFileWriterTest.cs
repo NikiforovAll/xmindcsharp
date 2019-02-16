@@ -32,7 +32,6 @@ namespace Tests
         public void Save_CreateEmptyBookWithFileWriterInCaseOfCustomBasePath_Success()
         {
 
-            var _customOutputFolderName = "custom-output/";
             var book = new XMindConfiguration()
                 .WriteTo.Writers(
                     new List<IXMindWriter>{
@@ -68,14 +67,15 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(defaultSettings: true)
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();
             //Assert
             DirectoryInfo di = new DirectoryInfo(_xmindOutputFolderName);
             di.GetFileSystemInfos("*.xml")
-                .Select(fi => fi.Should().BeOfType<FileInfo>().Which.Name.Should().BeOneOf(_files))
+                .Select(fi => fi.Should().BeOfType<FileInfo>().Which.Name
+                .Should().BeOneOf(_files))
                 .All(x => true);
         }
         [Test]
@@ -83,7 +83,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(defaultSettings: true, zip: true)
+                .SetUpXMindWithFileWriter(useDefaultPath:true,zip: true)
                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();
