@@ -4,6 +4,9 @@ using System.IO.Compression;
 using System;
 using System.IO;
 
+using XMindAPI.Configuration;
+using XMindAPI.Utils;
+
 namespace XMindAPI.Writers.Util
 {
     public static class FileWriterUtils

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
-using XMindAPI.Writers.Util;
 using System.Linq;
-using static XMindAPI.XMindConfigurationCache;
+
+using XMindAPI.Configuration;
+using static XMindAPI.Configuration.XMindConfigurationCache;
+using XMindAPI.Writers.Util;
+
 namespace XMindAPI.Writers
 {
     public class FileWriterFactory

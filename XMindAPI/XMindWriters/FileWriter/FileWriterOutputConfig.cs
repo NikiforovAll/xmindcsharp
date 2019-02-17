@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+
 using XMindAPI.Logging;
+using XMindAPI.Configuration;
 
 namespace XMindAPI.Writers
 {

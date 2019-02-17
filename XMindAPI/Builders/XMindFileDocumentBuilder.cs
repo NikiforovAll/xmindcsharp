@@ -2,11 +2,15 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using XMindAPI.Logging;
 using System.IO.Compression;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
-namespace XMindAPI
+
+using XMindAPI.Logging;
+using XMindAPI.Configuration;
+using XMindAPI.Utils;
+
+namespace XMindAPI.Builders
 {
     internal class XMindFileDocumentBuilder : XMindDocumentBuilder
     {

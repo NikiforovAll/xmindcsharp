@@ -17,10 +17,13 @@ Run following command from the root folder:
 dotnet test ./XMindAPI.Tests/
 ```
 
-## Deployment
+## Features
 
+### XMindWorkbook
 
-## Git Commit Guidelines
+## Contributing
+
+### Git Commit Guidelines
 
 ```
 <type>[optional scope]: <description>
@@ -30,7 +33,7 @@ dotnet test ./XMindAPI.Tests/
 [optional footer]
 ```
 
-### Type
+#### Type
 
 Must be one of the following:
 

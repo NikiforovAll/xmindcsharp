@@ -1,17 +1,20 @@
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Xml.Linq;
 using System.Linq;
 using System.Collections.Generic;
+
 using Serilog;
 using Serilog.Sinks.TestCorrelator;
+
+using NUnit.Framework;
+using FluentAssertions;
+
 using XMindAPI;
 using XMindAPI.Extensions;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
 using XMindAPI.Writers.Util;
-using FluentAssertions;
 namespace Tests
 {
     [TestFixture]

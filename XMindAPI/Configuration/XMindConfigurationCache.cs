@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace XMindAPI
+namespace XMindAPI.Configuration
 {
     /// <summary>
     /// Reads XMindConfiguration from xmindsettings.json file (or memory). It is possible to consume <see cref="IConfiguration"> as singleton via <seealso cref="XMindConfigCollection">

@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using System;
-using XMindAPI;
 using FluentAssertions;
 using System.Collections.Generic;
 
+using XMindAPI.Configuration;
 namespace Tests
 {
     [TestFixture]

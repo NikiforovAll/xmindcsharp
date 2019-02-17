@@ -1,12 +1,16 @@
-using NUnit.Framework;
 using System;
 using System.IO;
-using XMindAPI;
-using FluentAssertions;
 using System.Xml.Linq;
 using System.Linq;
+
+using NUnit.Framework;
+using FluentAssertions;
+
 using Serilog.Sinks.TestCorrelator;
 using Serilog;
+
+using XMindAPI;
+using XMindAPI.Builders;
 
 namespace Tests
 {

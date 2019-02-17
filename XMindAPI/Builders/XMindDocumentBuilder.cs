@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
-using Microsoft.Extensions.Configuration;
-using XMindAPI.Logging;
 using System.Linq;
-namespace XMindAPI
+using Microsoft.Extensions.Configuration;
+
+using XMindAPI.Logging;
+using XMindAPI.Configuration;
+namespace XMindAPI.Builders
 {
     internal class XMindDocumentBuilder : IXMindDocumentBuilder
     {
@@ -113,6 +115,11 @@ namespace XMindAPI
                 new XAttribute("version", "2.0")
             ));
             return content;
+        }
+
+        public void AddSheet()
+        {
+            throw new NotImplementedException();
         }
     }
 }
