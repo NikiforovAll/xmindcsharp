@@ -4,6 +4,7 @@ using System.Xml.Linq;
 
 namespace XMindAPI.Utils
 {
+    // USE DOM Utils instead
     internal static class XMindUtils
     {
         public static string NewId()

@@ -10,7 +10,7 @@ using Serilog.Sinks.TestCorrelator;
 using Serilog;
 
 using XMindAPI;
-using XMindAPI.Builders;
+using XMindAPI.Core.Builders;
 
 namespace Tests
 {

@@ -10,7 +10,7 @@ using XMindAPI.Logging;
 using XMindAPI.Configuration;
 using XMindAPI.Utils;
 
-namespace XMindAPI.Builders
+namespace XMindAPI.Core.Builders
 {
     internal class XMindFileDocumentBuilder : XMindDocumentBuilder
     {

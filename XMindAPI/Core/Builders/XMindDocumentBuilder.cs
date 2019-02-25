@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 using XMindAPI.Logging;
 using XMindAPI.Configuration;
-namespace XMindAPI.Builders
+namespace XMindAPI.Core.Builders
 {
     internal class XMindDocumentBuilder : IXMindDocumentBuilder
     {

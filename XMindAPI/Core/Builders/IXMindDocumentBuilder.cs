@@ -1,6 +1,6 @@
 using System.Xml.Linq;
 
-namespace XMindAPI.Builders
+namespace XMindAPI.Core.Builders
 {
     internal interface IXMindDocumentBuilder
     {
