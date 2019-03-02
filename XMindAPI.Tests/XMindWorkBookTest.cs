@@ -102,6 +102,23 @@ namespace Tests
                 .BeEquivalentTo("manifest.xml", "meta.xml", "content.xml");
         }
 
+
+        [Test]
+
+        public void CreateSheet_EmptySheet_Success()
+        {
+            //Arrange
+            var book = new XMindConfiguration()
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
+                .CreateWorkBook(workbookName: "test");
+
+            //Act
+            book.CreateSheet();
+            book.Save();
+            //Assert
+            
+        }
+
         [OneTimeTearDown]
         public void Cleanup()
         {

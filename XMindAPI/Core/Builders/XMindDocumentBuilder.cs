@@ -101,11 +101,11 @@ namespace XMindAPI.Core.Builders
 
         private XDocument CreateDefaultContentFile()
         {
+            
             var content = new XDocument();
             XNamespace ns2 = XNamespace.Get(xMindSettings["standardContentNamespaces:xsl"]);
             XNamespace ns3 = XNamespace.Get(xMindSettings["standardContentNamespaces:svg"]);
             XNamespace ns4 = XNamespace.Get(xMindSettings["standardContentNamespaces:xhtml"]);
-
             content.Add(new XElement(
                 XNamespace.Get(xMindSettings["contentNamespace"]) + "xmap-content",
                 new XAttribute(XNamespace.Xmlns + "fo", ns2),
@@ -115,11 +115,6 @@ namespace XMindAPI.Core.Builders
                 new XAttribute("version", "2.0")
             ));
             return content;
-        }
-
-        public void AddSheet()
-        {
-            throw new NotImplementedException();
         }
     }
 }

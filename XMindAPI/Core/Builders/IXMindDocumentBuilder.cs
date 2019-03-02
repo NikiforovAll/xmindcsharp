@@ -12,7 +12,5 @@ namespace XMindAPI.Core.Builders
         XDocument MetaFile { get; }
         XDocument ManifestFile { get; }
         XDocument ContentFile { get; }
-
-        void AddSheet();
     }
 }

@@ -8,8 +8,16 @@ namespace XMindAPI.Core
         /// <summary>
         /// Object title
         /// </summary>
-        /// <value></value>
-        string Title { get; set; }
+        /// <returns></returns>
+        string GetTitle();
+
+        /// <summary>
+        /// Object title
+        /// </summary>
+        /// <param name="value"></param>
+        void SetTitle(string value);
+
+
 
         /// <summary>
         /// Returns whether object has a valid text

@@ -1,7 +1,7 @@
 //TODO: cyclic dependency with XMindAPI.Configuration and XMindAPI.Writers.Configuraiton;
 using XMindAPI.Writers.Configuration;
 using XMindAPI.Core.Builders;
-
+using XMindAPI.Models;
 namespace XMindAPI.Configuration
 
 {

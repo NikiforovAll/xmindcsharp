@@ -1,31 +1,71 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using XMindAPI.Core;
+using XMindAPI.Core.DOM;
 
-namespace XMindAPI
+namespace XMindAPI.Models
 {
-    public class XMindSheet
+    public class XMindSheet : ISheet
     {
-        public string ID { get; private set; }
-        public string Name { get; private set; }
+        private readonly XElement implementation;
 
-        public List<XMindTopic> TopicFlatList { get; private set; }
-        public List<XMindTopic> Topics { get; private set; }
+        public string Id => throw new NotImplementedException();
 
-        private XMindSheet()
+        public string GetTitle()
         {
-            TopicFlatList = new List<XMindTopic>();
-            Topics = new List<XMindTopic>();
+            throw new NotImplementedException();
         }
 
-        internal XMindSheet(string sheetId, string sheetName) : this()
+        public void SetTitle(string value)
         {
-            ID = sheetId;
-            Name = sheetName;
+            throw new NotImplementedException();
         }
 
-        public new string ToString()
+        public IWorkbook OwnedWorkbook { get; set ; }
+
+        public XElement Implementation => implementation;
+
+        public XMindSheet(XElement implementation, XMindWorkBook book)
         {
-            return Name;
+            this.OwnedWorkbook = book;
+            this.implementation = DOMUtils.AddIdAttribute(implementation);
+            implementation.Attributes().Where(x => x.IsNamespaceDeclaration).Remove();
+        }
+        public void AddRelationship(IRelationship relationship)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T GetAdapter<T>(Type adapter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HashSet<IRelationship> GetRelationships()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ITopic GetRootTopic()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool HasTitle()
+        {
+            return !String.IsNullOrEmpty(GetTitle());
+        }
+
+        public void RemoveRelationship(IRelationship relationship)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReplaceRootTopic(ITopic newRootTopic)
+        {
+            throw new NotImplementedException();
         }
     }
 

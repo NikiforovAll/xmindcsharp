@@ -14,8 +14,10 @@ using XMindAPI.Writers;
 using XMindAPI.Logging;
 using XMindAPI.Core;
 using XMindAPI.Core.Builders;
+using XMindAPI.Core.DOM;
+using static XMindAPI.Core.DOM.DOMConstants;
 
-namespace XMindAPI
+namespace XMindAPI.Models
 {
     /// <summary>
     /// XMindWorkBook encapsulates an XMind workbook and methods for performing actions on workbook content. 
@@ -25,8 +27,11 @@ namespace XMindAPI
         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         private readonly XMindConfiguration _globalConfiguration;
         private readonly IXMindDocumentBuilder _documentBuilder;
+
+        private NodeAdaptableRegistry _adaptableRegistry;
         internal readonly XMindConfigurationCache _xMindSettings;
 
+        private readonly XElement implementation;
 
         // private string _fileName = null;
 
@@ -40,14 +45,17 @@ namespace XMindAPI
             _xMindSettings = config;
             _globalConfiguration = globalConfiguration;
             _documentBuilder = builder;
+
             _documentBuilder.CreateMetaFile();
             _documentBuilder.CreateManifestFile();
             _documentBuilder.CreateContentFile();
-            //TODO: use builder in order to work with XDocuments, ideally get rid of XML namespace in workbook
+            
+            implementation = _documentBuilder.ContentFile.Descendants().First();
+            _adaptableRegistry = new NodeAdaptableRegistry(_documentBuilder.ContentFile);
         }
 
 
-        public T getAdapter<T>(Type adapter)
+        public T GetAdapter<T>(Type adapter)
         {
             //TODO: this is point of extension for all adaptees
             // if (IStorage.class.equals(adapter))
@@ -139,7 +147,11 @@ namespace XMindAPI
 
         public override ISheet CreateSheet()
         {
-            throw new NotImplementedException();
+            var sheetElement = new XElement(TAG_SHEET);
+            implementation.Add(sheetElement);
+            XMindSheet sheet = new XMindSheet(sheetElement, this);
+            _adaptableRegistry.RegisterByNode(sheet, sheet.Implementation);
+            return sheet;
         }
 
         public override ITopic CreateTopic()
