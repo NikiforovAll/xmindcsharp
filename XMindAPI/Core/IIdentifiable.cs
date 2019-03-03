@@ -8,7 +8,7 @@ namespace XMindAPI.Core
         /// <summary>
         /// Provides access to Id of object
         /// </summary>
-        /// <value></value>
-        string Id {get;}
+        /// <returns></returns>
+        string GetId();
     }
 }

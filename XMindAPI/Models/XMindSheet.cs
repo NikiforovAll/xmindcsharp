@@ -4,6 +4,8 @@ using System.Linq;
 using System.Xml.Linq;
 using XMindAPI.Core;
 using XMindAPI.Core.DOM;
+using static XMindAPI.Core.DOM.DOMConstants;
+
 
 namespace XMindAPI.Models
 {
@@ -11,19 +13,22 @@ namespace XMindAPI.Models
     {
         private readonly XElement implementation;
 
-        public string Id => throw new NotImplementedException();
+        public string GetId()
+        {
+            return implementation.Attribute(ATTR_ID).Value;
+        }
 
         public string GetTitle()
         {
-            throw new NotImplementedException();
+            return DOMUtils.GetTextContentByTag(implementation, TAG_TITLE);
         }
 
         public void SetTitle(string value)
         {
-            throw new NotImplementedException();
+            DOMUtils.SetText(implementation, TAG_TITLE,value);
         }
 
-        public IWorkbook OwnedWorkbook { get; set ; }
+        public IWorkbook OwnedWorkbook { get; set; }
 
         public XElement Implementation => implementation;
 
@@ -64,6 +69,26 @@ namespace XMindAPI.Models
         }
 
         public void ReplaceRootTopic(ITopic newRootTopic)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return $"SHT# Id:{GetId()} ({GetTitle()})";
+        }
+
+        public IWorkbook GetParent()
+        {
+            XNode node = this.Implementation.Parent;
+            if(node == (OwnedWorkbook as XMindWorkBook).GetWorkbookElement())
+            {
+                return OwnedWorkbook;
+            }
+            return null;
+        }
+
+        public int GetIndex()
         {
             throw new NotImplementedException();
         }

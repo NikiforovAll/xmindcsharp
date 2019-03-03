@@ -7,11 +7,13 @@ using System.Collections.Generic;
 using Serilog;
 using Serilog.Sinks.TestCorrelator;
 using XMindAPI;
+using XMindAPI.Models;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
 using FluentAssertions;
 using XMindAPI.Writers.Util;
 using XMindAPI.Extensions;
+using System.Collections;
 
 namespace Tests
 {
@@ -21,7 +23,7 @@ namespace Tests
 
         private readonly string _customOutputFolderName = Path.Combine(Path.GetTempPath(), "test-output");
         private readonly string[] _files = { "manifest.xml", "meta.xml", "content.xml" };
-        private readonly bool _isCleanUpNeeded = false;
+        private readonly bool _isCleanUpNeeded = true;
 
         [SetUp]
         public void Setup()
@@ -29,7 +31,7 @@ namespace Tests
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Sink(new TestCorrelatorSink())
-                .WriteTo.File("test.log", retainedFileCountLimit: 3)
+                .WriteTo.File("book.test.log", retainedFileCountLimit: 3)
                 .CreateLogger();
         }
 
@@ -105,19 +107,44 @@ namespace Tests
 
         [Test]
 
-        public void CreateSheet_EmptySheet_Success()
+        public void GetPrimarySheet_EmptySheet_Success()
+        {
+            //Arrange
+            var book = new XMindConfiguration()
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .CreateWorkBook(workbookName: "test");
+
+            //Act
+            var sheet = book.CreateSheet();
+            var sheet2 = book.CreateSheet();
+
+            book.Save();
+            //Assert
+            book.GetPrimarySheet().Should().Be(
+                (XMindSheet)sheet,
+                "Primary book as first sheet"
+                );
+        }
+
+        [Test]
+        public void GetSheets_MultipleSheets_Success()
         {
             //Arrange
             var book = new XMindConfiguration()
                 .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
                 .CreateWorkBook(workbookName: "test");
 
+            int numberOfSheets = 2;
+            for (int i = 0; i < numberOfSheets; i++)
+            {
+                book.CreateSheet();
+            }
             //Act
-            book.CreateSheet();
-            book.Save();
-            //Assert
-            
+            var sheets = book.GetSheets();
+            //Arrange
+            sheets.Count().Should().Be(numberOfSheets, $"{numberOfSheets} were generated");
         }
+ 
 
         [OneTimeTearDown]
         public void Cleanup()

@@ -24,5 +24,9 @@ namespace XMindAPI.Core
 
         void RemoveRelationship(IRelationship relationship);
 
+        IWorkbook GetParent();
+
+        int GetIndex();
+
     }
 }

@@ -23,7 +23,7 @@ namespace Tests
         private readonly string _customOutputFolderName = "custom-output";
         private readonly string _xmindOutputFolderName = "xmind-output";
         private readonly string[] _files = { "manifest.xml", "meta.xml", "content.xml" };
-        private readonly bool _isCleanUpNeeded = false;
+        private readonly bool _isCleanUpNeeded = true;
 
         [SetUp]
         public void Setup()

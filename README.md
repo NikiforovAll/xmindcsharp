@@ -19,6 +19,11 @@ dotnet test ./XMindAPI.Tests/
 
 ## Features
 
+## TODO
+
+* TODOs in code base
+* Make sure that XMindBook is read correctly from disk, e.g. all adaptables are created and registry is ready for usage.
+
 ### XMindWorkbook
 
 ## Contributing

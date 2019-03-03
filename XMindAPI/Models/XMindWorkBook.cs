@@ -22,7 +22,7 @@ namespace XMindAPI.Models
     /// <summary>
     /// XMindWorkBook encapsulates an XMind workbook and methods for performing actions on workbook content. 
     /// </summary>
-    public class XMindWorkBook : AbstractWorkbook//IWorkbook
+    public class XMindWorkBook : AbstractWorkbook, INodeAdaptableFactory//IWorkbook
     {
         private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         private readonly XMindConfiguration _globalConfiguration;
@@ -31,7 +31,8 @@ namespace XMindAPI.Models
         private NodeAdaptableRegistry _adaptableRegistry;
         internal readonly XMindConfigurationCache _xMindSettings;
 
-        private readonly XElement implementation;
+        private readonly XElement _implementation;
+        
 
         // private string _fileName = null;
 
@@ -49,9 +50,9 @@ namespace XMindAPI.Models
             _documentBuilder.CreateMetaFile();
             _documentBuilder.CreateManifestFile();
             _documentBuilder.CreateContentFile();
-            
-            implementation = _documentBuilder.ContentFile.Descendants().First();
-            _adaptableRegistry = new NodeAdaptableRegistry(_documentBuilder.ContentFile);
+
+            _implementation = _documentBuilder.ContentFile.Descendants().First();
+            _adaptableRegistry = new NodeAdaptableRegistry(_documentBuilder.ContentFile, this);
         }
 
 
@@ -148,7 +149,7 @@ namespace XMindAPI.Models
         public override ISheet CreateSheet()
         {
             var sheetElement = new XElement(TAG_SHEET);
-            implementation.Add(sheetElement);
+            GetWorkbookElement().Add(sheetElement);
             XMindSheet sheet = new XMindSheet(sheetElement, this);
             _adaptableRegistry.RegisterByNode(sheet, sheet.Implementation);
             return sheet;
@@ -176,17 +177,58 @@ namespace XMindAPI.Models
 
         public override ISheet GetPrimarySheet()
         {
-            throw new NotImplementedException();
+            XElement primarySheet = DOMUtils.GetFirstElementByTagName(GetWorkbookElement(), TAG_SHEET);
+            if(primarySheet != null)
+            {
+                return (ISheet) GetAdaptableRegistry().GetAdaptable(primarySheet);
+            }
+            return null;
         }
 
         public override IEnumerable<ISheet> GetSheets()
         {
-            throw new NotImplementedException();
+            return DOMUtils.GetChildList<ISheet>(GetWorkbookElement(), TAG_SHEET, GetAdaptableRegistry());
         }
-
         public override void RemoveSheet(ISheet sheet)
         {
             throw new NotImplementedException();
         }
+        public IAdaptable CreateAdaptable(XNode node)
+        {
+            IAdaptable a = null;
+            if(node is XElement)
+            {
+                XElement e = (XElement) node;
+                XName nodeName = e.Name;
+                switch (nodeName.ToString())
+                {
+                    case TAG_SHEET:
+                       a = new XMindSheet(e, this);
+                    break;
+                }
+            }
+            if(a != null)
+            {
+                Logger.Info($"XMindWorkbook.CreateAdaptable: adaptable is created - {a}");
+            }
+            return a;
+        }
+
+        public override string ToString()
+        {
+            return $"Workbook# {_globalConfiguration.WorkbookName}";
+        }
+
+        private NodeAdaptableRegistry GetAdaptableRegistry()
+        {
+            return _adaptableRegistry;
+        }
+
+        internal XElement GetWorkbookElement()
+        {
+            return this._implementation;
+        }
+
+        
     }
 }
