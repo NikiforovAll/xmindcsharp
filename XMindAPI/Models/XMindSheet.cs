@@ -12,6 +12,7 @@ namespace XMindAPI.Models
     public class XMindSheet : ISheet
     {
         private readonly XElement implementation;
+        private XMindWorkBook _ownedWorkbook;
 
         public string GetId()
         {
@@ -25,10 +26,14 @@ namespace XMindAPI.Models
 
         public void SetTitle(string value)
         {
-            DOMUtils.SetText(implementation, TAG_TITLE,value);
+            DOMUtils.SetText(implementation, TAG_TITLE, value);
         }
 
-        public IWorkbook OwnedWorkbook { get; set; }
+        public IWorkbook OwnedWorkbook 
+        { 
+            get => _ownedWorkbook;
+            set => _ownedWorkbook = (XMindWorkBook)value; 
+        }
 
         public XElement Implementation => implementation;
 
@@ -36,7 +41,10 @@ namespace XMindAPI.Models
         {
             this.OwnedWorkbook = book;
             this.implementation = DOMUtils.AddIdAttribute(implementation);
-            implementation.Attributes().Where(x => x.IsNamespaceDeclaration).Remove();
+            // implementation.Attributes().Where(x => x.IsNamespaceDeclaration).Remove();
+            //creates default topic if needed
+            DOMUtils.EnsureChildElement(implementation, TAG_TOPIC);
+
         }
         public void AddRelationship(IRelationship relationship)
         {
@@ -55,7 +63,8 @@ namespace XMindAPI.Models
 
         public ITopic GetRootTopic()
         {
-            throw new NotImplementedException();
+            XElement rootTopic = DOMUtils.GetFirstElementByTagName(Implementation, TAG_TOPIC);
+            return (ITopic) (OwnedWorkbook as XMindWorkBook).GetAdaptableRegistry().GetAdaptable(rootTopic);
         }
 
         public bool HasTitle()
@@ -70,7 +79,9 @@ namespace XMindAPI.Models
 
         public void ReplaceRootTopic(ITopic newRootTopic)
         {
-            throw new NotImplementedException();
+            XElement rootTopic = (GetRootTopic() as XMindTopic).Implementation;
+            rootTopic.AddAfterSelf((newRootTopic as XMindTopic).Implementation);
+            rootTopic.Remove();
         }
 
         public override string ToString()
@@ -81,7 +92,7 @@ namespace XMindAPI.Models
         public IWorkbook GetParent()
         {
             XNode node = this.Implementation.Parent;
-            if(node == (OwnedWorkbook as XMindWorkBook).GetWorkbookElement())
+            if (node == (OwnedWorkbook as XMindWorkBook).GetWorkbookElement())
             {
                 return OwnedWorkbook;
             }
@@ -90,7 +101,12 @@ namespace XMindAPI.Models
 
         public int GetIndex()
         {
-            throw new NotImplementedException();
+            return GetParent().GetSheets().ToList().IndexOf(this);
+        }
+        
+        public override int GetHashCode()
+        {
+            return this.Implementation.GetHashCode();
         }
     }
 

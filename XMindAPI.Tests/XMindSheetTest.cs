@@ -5,7 +5,6 @@ using System.Xml.Linq;
 using System.Linq;
 using System.Collections.Generic;
 using Serilog;
-using Serilog.Sinks.TestCorrelator;
 using XMindAPI;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
@@ -26,7 +25,6 @@ namespace Tests
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.Sink(new TestCorrelatorSink())
                 .WriteTo.File("sheet.test.log", retainedFileCountLimit: 3)
                 .CreateLogger();
         }
@@ -39,9 +37,9 @@ namespace Tests
                 .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Act
-            var parent = book
-                .CreateSheet()
-                .GetParent();
+            var sheet = book.CreateSheet();
+            book.AddSheet(sheet);
+            var parent = sheet.GetParent();
             //Arrange
             parent.Should().Be((XMindWorkBook)book, $"Sheet as direct ancestor");
         }
@@ -51,16 +49,31 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
                 .CreateWorkBook(workbookName: "test");
             string title = "Awesome sheet";
             //Act
             var sheet = book
                 .CreateSheet();
             sheet.SetTitle(title);
+            //Assert
+            sheet.GetTitle().Should().Be(title, $"because title for topic is specified");
+        }
+
+        [Test]
+        public void ReplaceRootTopic_DefaultFlow_Success()
+        {
             //Arrange
-            book.Save();
-            sheet.GetTitle().Should().Be(title, $"Sheet as direct ancestor");
+            var book = new XMindConfiguration()
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
+                .CreateWorkBook(workbookName: "test");
+            var topic = book.CreateTopic();
+            //Act
+            book
+                .GetPrimarySheet()
+                .ReplaceRootTopic(topic);
+            //Assert
+            book.GetPrimarySheet().GetRootTopic().Should().Be(topic, "because we replace root topic with new one");
         }
 
         [OneTimeTearDown]

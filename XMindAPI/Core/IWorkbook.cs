@@ -18,16 +18,11 @@ namespace XMindAPI.Core
         /// </summary>
         /// <returns></returns>
         ISheet CreateSheet();
-
-        IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2);
-
-        IRelationship CreateRelationship();
-
+        void AddSheet(ISheet sheet);
+        void AddSheet(ISheet sheet, int index);
         IEnumerable<ISheet> GetSheets();
 
         ISheet GetPrimarySheet();
-
-        void AddSheet(ISheet sheet);
 
         void RemoveSheet(ISheet sheet);
 
@@ -38,8 +33,6 @@ namespace XMindAPI.Core
         /// <returns>The element with the given identifier string.</returns>
         /// TODO: consider to use IWorkbookComponent for return type
         object GetElementById(string id);
-
-        
         /// <summary>
         /// Finds an element with the given identifier string requested starting from the source object.
         /// </summary>
@@ -52,7 +45,7 @@ namespace XMindAPI.Core
         /// Get a topic element with a given id.
         /// </summary>
         /// <returns></returns>
-        ITopic FindTopic();
+        ITopic FindTopic(string id);
         
         // IManifest GetManifest()
         // IMeta GetMate()
@@ -62,9 +55,7 @@ namespace XMindAPI.Core
         /// <seealso cref="Writers.Configuration.XMindWriterConfiguration"/>
         /// </summary>
         void Save();
-
-        
-
-
+        IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2);
+        IRelationship CreateRelationship();
     }
 }

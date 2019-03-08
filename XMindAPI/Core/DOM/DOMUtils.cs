@@ -3,11 +3,14 @@ using System.Xml.Linq;
 using System.Linq;
 using static XMindAPI.Core.DOM.DOMConstants;
 using System.Collections.Generic;
+using XMindAPI.Logging;
 
 namespace XMindAPI.Core.DOM
 {
     internal class DOMUtils
     {
+    private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+
         internal static XElement AddIdAttribute(XElement element)
         {
             if(!element.Attributes().Any())
@@ -20,9 +23,25 @@ namespace XMindAPI.Core.DOM
 
         internal static XElement GetElementById(XDocument document, string id)
         {
-            return document.Descendants()
-                    .Where(el => el.Attribute("id").Equals(id))
-                    .FirstOrDefault();
+            var result = document.Descendants()
+                .Where(el => el.Attributes("id").FirstOrDefault()?.Equals(id) ?? false)
+                .FirstOrDefault();
+            if(result == null)
+            {
+                result = document.Descendants().FirstOrDefault(el => GetElementById(el, id) != null);
+            }
+            return result;
+        }
+
+        internal static XElement GetElementById(XElement element, string id)
+        {
+            XElement result = null;
+            foreach (var item in element.Descendants())
+            {
+                result = item.Attributes("id").FirstOrDefault()?.Equals(id) ?? false ? item : null;
+                result = GetElementById(item, id);
+            }
+            return result;
         }
 
         
@@ -98,6 +117,23 @@ namespace XMindAPI.Core.DOM
             return innerElement;
         }
 
-        
+        internal static XElement EnsureChildElement(XNode parent, String tagName)
+        {
+            XElement element;
+            if(parent.NodeType == System.Xml.XmlNodeType.Document)
+            {
+                element = parent.Parent;
+            }
+            else
+            {
+                element = GetFirstElementByTagName(parent, tagName);
+            }
+            if(element == null)
+            {
+                Logger.Info($"EnsureChildElement.CreateElement: item {tagName}was created for {parent.NodeType}");   
+                CreateElement(parent, tagName);
+            }
+            return element;
+        }
     }
 }

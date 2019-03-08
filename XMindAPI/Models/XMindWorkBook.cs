@@ -1,4 +1,5 @@
-﻿using System;
+﻿//TODO: cyclic dependency with XMindAPI.Configuration and XMindAPI.Writers.Configuraiton;
+using System;
 
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,10 +33,8 @@ namespace XMindAPI.Models
         internal readonly XMindConfigurationCache _xMindSettings;
 
         private readonly XElement _implementation;
-        
 
         // private string _fileName = null;
-
 
         /// <summary>
         /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
@@ -53,8 +52,14 @@ namespace XMindAPI.Models
 
             _implementation = _documentBuilder.ContentFile.Descendants().First();
             _adaptableRegistry = new NodeAdaptableRegistry(_documentBuilder.ContentFile, this);
-        }
+            //Create default sheet if needed
+            //TODO:
+            if(DOMUtils.GetFirstElementByTagName(_implementation, TAG_SHEET) == null)
+            {
+                AddSheet(CreateSheet());
+            }
 
+        }
 
         public T GetAdapter<T>(Type adapter)
         {
@@ -91,9 +96,6 @@ namespace XMindAPI.Models
             //     return adapter.cast(getWorkbookExtensionManager());
             return base.GetAdapter<T>(adapter);
         }
-
-
-    
 
         /// <summary>
         /// Save the current XMind workbook file to disk.
@@ -149,38 +151,63 @@ namespace XMindAPI.Models
         public override ISheet CreateSheet()
         {
             var sheetElement = new XElement(TAG_SHEET);
-            GetWorkbookElement().Add(sheetElement);
+            // GetWorkbookElement().Add(sheetElement);
             XMindSheet sheet = new XMindSheet(sheetElement, this);
             _adaptableRegistry.RegisterByNode(sheet, sheet.Implementation);
             return sheet;
         }
 
+        public override void AddSheet(ISheet sheet, int index)
+        {
+            XElement elementImplementation = (sheet as XMindSheet)?.Implementation;
+            var bookImplementation = GetWorkbookElement();
+            if (elementImplementation == null)
+            {
+                Logger.Warn("XMindWorkbook.AddSheet: sheet is not correct");
+                return;
+            }
+            // if (elementImplementation.Parent != bookImplementation)
+            // {
+            //     Logger.Warn("XMindWorkbook.AddSheet: sheet must belong to same document");
+            // }
+            var childElements = DOMUtils.GetChildElementsByTag(bookImplementation, TAG_SHEET);
+            if (index >= 0 && index < childElements.Count())
+            {
+                childElements.Where((e, i) => i == index)
+                    .First()
+                    .AddBeforeSelf(elementImplementation);
+            }else
+            {
+                bookImplementation.Add(elementImplementation);
+            }
+        }
+
         public override ITopic CreateTopic()
         {
-            throw new NotImplementedException();
+            var topicElement = new XElement(TAG_TOPIC);
+            // GetWorkbookElement().Add(topicElement);
+            XMindTopic topic = new XMindTopic(topicElement, this);
+            _adaptableRegistry.RegisterByNode(topic, topic.Implementation);
+            return topic;
         }
 
         public override object FindElement(string id, IAdaptable source)
         {
-            throw new NotImplementedException();
-        }
-
-        public override ITopic FindTopic()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override object GetElementById(string id)
-        {
-            throw new NotImplementedException();
+            XNode node = source.GetAdapter<XNode>(typeof(XNode));
+            if(node == null)
+            {
+                node = this.GetWorkbookElement();
+            }
+            return GetAdaptableRegistry()
+                .GetAdaptable(id, node.Document);
         }
 
         public override ISheet GetPrimarySheet()
         {
             XElement primarySheet = DOMUtils.GetFirstElementByTagName(GetWorkbookElement(), TAG_SHEET);
-            if(primarySheet != null)
+            if (primarySheet != null)
             {
-                return (ISheet) GetAdaptableRegistry().GetAdaptable(primarySheet);
+                return (ISheet)GetAdaptableRegistry().GetAdaptable(primarySheet);
             }
             return null;
         }
@@ -191,25 +218,45 @@ namespace XMindAPI.Models
         }
         public override void RemoveSheet(ISheet sheet)
         {
-            throw new NotImplementedException();
+            XElement elementImplementation = (sheet as XMindSheet)?.Implementation;
+            var bookImplementation = GetWorkbookElement();
+            if (elementImplementation == null)
+            {
+                Logger.Warn("XMindWorkbook.RemoveSheet: sheet is not correct");
+                return;
+            }
+            if (elementImplementation.Parent != bookImplementation)
+            {
+                Logger.Warn("XMindWorkbook.RemoveSheet: sheet must belong to same document");
+            }
+            var childElements = DOMUtils
+                .GetChildElementsByTag(bookImplementation, TAG_SHEET).ToList();
+            childElements
+                .FirstOrDefault(el => el == elementImplementation)?
+                .Remove();
         }
         public IAdaptable CreateAdaptable(XNode node)
         {
             IAdaptable a = null;
-            if(node is XElement)
+            if (node is XElement)
             {
-                XElement e = (XElement) node;
+                XElement e = (XElement)node;
                 XName nodeName = e.Name;
                 switch (nodeName.ToString())
                 {
                     case TAG_SHEET:
-                       a = new XMindSheet(e, this);
-                    break;
+                        a = new XMindSheet(e, this);
+                        break;
+                    case TAG_TOPIC:
+                        a = new XMindTopic(e, this);
+                        break;
                 }
             }
-            if(a != null)
+            if (a != null)
             {
                 Logger.Info($"XMindWorkbook.CreateAdaptable: adaptable is created - {a}");
+            }else{
+                Logger.Warn($"XMindWorkbook.CreateAdaptable: adaptable was is not created - {a}");
             }
             return a;
         }
@@ -219,7 +266,7 @@ namespace XMindAPI.Models
             return $"Workbook# {_globalConfiguration.WorkbookName}";
         }
 
-        private NodeAdaptableRegistry GetAdaptableRegistry()
+        internal NodeAdaptableRegistry GetAdaptableRegistry()
         {
             return _adaptableRegistry;
         }
@@ -228,7 +275,5 @@ namespace XMindAPI.Models
         {
             return this._implementation;
         }
-
-        
     }
 }

@@ -19,6 +19,25 @@ dotnet test ./XMindAPI.Tests/
 
 ## Features
 
+### Book
+
+* Initialize book
+* Create Sheet
+* Add Sheet
+* Get Sheets
+* Get Primary Sheet
+* Remove Sheet
+* Find Topic
+* Sheet indexing
+
+### Sheet
+
+TODO:
+
+* Make sure that book loading and manipulation is correct
+* Relationship support
+* Investigate what happens when elements are deleted, probably need to update registry via event dispatching
+
 ## TODO
 
 * TODOs in code base

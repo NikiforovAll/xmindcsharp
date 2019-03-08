@@ -7,8 +7,10 @@ namespace XMindAPI.Core
     {
         public void AddSheet(ISheet sheet)
         {
-            throw new NotImplementedException();
+            AddSheet(sheet, -1);
         }
+
+        public abstract void AddSheet(ISheet sheet, int index);
 
         public abstract IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2);
 
@@ -20,14 +22,26 @@ namespace XMindAPI.Core
 
         public abstract object FindElement(string id, IAdaptable source);
 
-        public abstract ITopic FindTopic();
+        public ITopic FindTopic(string id, IAdaptable source)
+        {
+            Object element = FindElement(id, source);
+            return element as ITopic;
+        }
+
+        public ITopic FindTopic(string id)
+        {
+            return FindTopic(id, this);
+        }
 
         public T GetAdapter<T>(Type t)
         {
             return default(T);
         }
 
-        public abstract object GetElementById(string id);
+        public object GetElementById(string id)
+        {
+            return FindElement(id, this);
+        }
 
         public abstract ISheet GetPrimarySheet();
 

@@ -26,7 +26,9 @@ namespace XMindAPI.Core.DOM
         public IAdaptable GetAdaptableById(String id, XDocument document)
         {
             Logger.Info($"NodeAdaptableRegistry.GetAdaptableById: Getting element by Id: {id}");
-            return _idMap[GetIDKey(id, document)];
+            if(!_idMap.TryGetValue(GetIDKey(id, document), out var result))
+                return null;
+            return result;
         }
         public IAdaptable GetAdaptableByNode(XNode node)
         {
@@ -45,7 +47,7 @@ namespace XMindAPI.Core.DOM
             if(a == null)
             {
                 XElement element = DOMUtils.GetElementById(document, id);
-                if(element == null)
+                if(element != null)
                 {
                     a = GetAdaptableByNode(element);
                     if(a == null)
@@ -63,6 +65,7 @@ namespace XMindAPI.Core.DOM
         }
         public IAdaptable GetAdaptable(XNode node)
         {
+            if(node == null) return null;
             if(!_nodeMap.TryGetValue(node, out IAdaptable a))
             {
                 a = _factory.CreateAdaptable(node);
@@ -176,7 +179,7 @@ namespace XMindAPI.Core.DOM
         {
             if (node.NodeType == System.Xml.XmlNodeType.Element)
             {
-                (node as XElement).Attributes(ATTR_ID).FirstOrDefault();
+                return (node as XElement).Attributes(ATTR_ID).First().Value;
             }
             return null;
         }

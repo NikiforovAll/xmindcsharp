@@ -14,6 +14,7 @@ using FluentAssertions;
 using XMindAPI.Writers.Util;
 using XMindAPI.Extensions;
 using System.Collections;
+using XMindAPI.Core;
 
 namespace Tests
 {
@@ -104,7 +105,6 @@ namespace Tests
                 .BeEquivalentTo("manifest.xml", "meta.xml", "content.xml");
         }
 
-
         [Test]
 
         public void GetPrimarySheet_EmptySheet_Success()
@@ -113,17 +113,8 @@ namespace Tests
             var book = new XMindConfiguration()
                 .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
-
-            //Act
-            var sheet = book.CreateSheet();
-            var sheet2 = book.CreateSheet();
-
-            book.Save();
             //Assert
-            book.GetPrimarySheet().Should().Be(
-                (XMindSheet)sheet,
-                "Primary book as first sheet"
-                );
+            book.GetPrimarySheet().Should().NotBeNull("because primary sheet is created by default");
         }
 
         [Test]
@@ -137,14 +128,56 @@ namespace Tests
             int numberOfSheets = 2;
             for (int i = 0; i < numberOfSheets; i++)
             {
-                book.CreateSheet();
+                book.AddSheet(book.CreateSheet());
             }
             //Act
             var sheets = book.GetSheets();
-            //Arrange
-            sheets.Count().Should().Be(numberOfSheets, $"{numberOfSheets} were generated");
+            //Assert
+            sheets.Count().Should().Be(++numberOfSheets, $"{numberOfSheets} were generated");
         }
- 
+
+        [Test]
+        public void AddSheet_InsertSheetAsPrimary_Success()
+        {
+            //Arrange
+            var book = new XMindConfiguration()
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .CreateWorkBook(workbookName: "test");
+            var sheet = book.CreateSheet();
+            //Act
+            book.AddSheet(sheet, 0);
+            //Assert
+            book.GetPrimarySheet().Should().Be(sheet, "The last book must become primary");
+        }
+
+        [Test]
+        public void RemoveSheet_RemovePrimarySheet()
+        {
+            //Arrange
+            var book = new XMindConfiguration()
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .CreateWorkBook(workbookName: "test");
+            var primarySheet = book.GetPrimarySheet();
+            //Act
+            book.RemoveSheet(primarySheet);
+            //Assert
+            book.GetSheets().Count().Should().Be(0, "because we deleted primary sheet and there are no other sheets");
+        }
+
+        [Test]
+        public void FindTopic_Default_Success()
+        {
+            //Arrange
+            var book = new XMindConfiguration()
+                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .CreateWorkBook(workbookName: "FindTopic_Default_Success");
+            //Act
+            var topic = book.GetPrimarySheet().GetRootTopic();
+            //Assert
+            book.FindTopic(topic.GetId(), book)
+                .Should().BeOfType<XMindTopic>("because we specify id of a topic")
+                .Which.Should().Be(topic);
+        }
 
         [OneTimeTearDown]
         public void Cleanup()

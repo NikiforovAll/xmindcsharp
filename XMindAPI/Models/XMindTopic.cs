@@ -1,5 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using XMindAPI.Core;
+using XMindAPI.Core.DOM;
+using XMindAPI.Models;
+using static XMindAPI.Core.DOM.DOMConstants;
 
 namespace XMindAPI
 {
@@ -7,40 +13,76 @@ namespace XMindAPI
     /// <summary>
     ///  Base element of build XMind maps, topics are added to <see cref="XMindWorkBook"/>
     /// </summary>
-    public class XMindTopic
+    public class XMindTopic : ITopic
     {
-        /// <summary>
-        ///   Topic ID
-        /// </summary>
-        /// <value></value>
-        public string ID { get; private set; }
-        /// <summary>
-        /// Topic Name
-        /// </summary>
-        /// <value></value>
-        public string Name { get; private set; }
-
-        /// <summary>
-        /// Parent Topic
-        /// </summary>
-        /// <value></value>
-        public XMindTopic Parent { get; private set; }
-        /// <summary>
-        /// List of descendant topics
-        /// </summary>
-        /// <value></value>
-        public List<XMindTopic> Topics { get; private set; }
-
-        private XMindTopic()
+        public XMindTopic(XElement implementation, XMindWorkBook book)
         {
-            Topics = new List<XMindTopic>();
+            this.OwnedWorkbook = book;
+            this.Implementation = DOMUtils.AddIdAttribute(implementation);
         }
 
-        internal XMindTopic(XMindTopic parent, string id, string name) : this()
+        public IWorkbook OwnedWorkbook { get; }
+        public XElement Implementation { get; }
+
+        public void AddLabel(string label)
         {
-            Parent = parent;
-            ID = id;
-            Name = name;
+            throw new NotImplementedException();
+        }
+
+        public T GetAdapter<T>(Type adapter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetId()
+        {
+            return Implementation.Attribute(ATTR_ID).Value;
+        }
+
+        public HashSet<string> GetLabels()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetTitle()
+        {
+            return DOMUtils.GetTextContentByTag(Implementation, TAG_TITLE);
+        }
+
+        public bool HasTitle()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAllLabels()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveLabel(string label)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLabels(ICollection<string> labels)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetTitle(string value)
+        {
+            DOMUtils.SetText(Implementation, TAG_TITLE, value);
+        }
+
+
+        public override int GetHashCode()
+        {
+            return Implementation.GetHashCode();
+        }
+        
+        public override string ToString()
+        {
+            return $"TPC# Id:{GetId()} ({GetTitle()})";
         }
     }
 
