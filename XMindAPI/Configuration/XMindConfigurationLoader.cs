@@ -35,10 +35,11 @@ namespace XMindAPI.Configuration
         /// <returns>Mapping between filename to location. [filename => location]</returns>
         internal Dictionary<string, string> GetOutputFilesLocations()
         {
-            if(XMindConfigCollection is null) {
+            if (XMindConfigCollection is null)
+            {
                 throw new InvalidOperationException("Output files are not configured");
             }
-            var basePath = XMindConfigCollection["output:base"];
+            // var basePath = XMindConfigCollection["output:base"];
             var sectionGroup = XMindConfigCollection.GetSection("output:files").GetChildren();
             var result = sectionGroup.ToDictionary(
                     s => s.GetChildren().FirstOrDefault(kvp => kvp.Key == "name").Value,
@@ -51,15 +52,12 @@ namespace XMindAPI.Configuration
         /// Entry point for configuration for working with main files.
         /// </summary>
         /// <returns>Mapping between manifest config token (label) to filename. [label => filename]</returns>
-        internal Dictionary<string, string> GetOutputFilesDefinitions()
+        internal Dictionary<string, string> GetOutputFilesDefinitions() => new Dictionary<string, string>
         {
-            return new Dictionary<string, string>
-            {
-                [XMindConfiguration.ManifestLabel] = XMindConfigCollection[XMindConfiguration.ManifestLabel],
-                [XMindConfiguration.MetaLabel] = XMindConfigCollection[XMindConfiguration.MetaLabel],
-                [XMindConfiguration.ContentLabel] = XMindConfigCollection[XMindConfiguration.ContentLabel]
-            };
-        }
+            [XMindConfiguration.ManifestLabel] = XMindConfigCollection[XMindConfiguration.ManifestLabel],
+            [XMindConfiguration.MetaLabel] = XMindConfigCollection[XMindConfiguration.MetaLabel],
+            [XMindConfiguration.ContentLabel] = XMindConfigCollection[XMindConfiguration.ContentLabel]
+        };
         private XMindConfigurationLoader LoadConfigurationFile()
         {
             try

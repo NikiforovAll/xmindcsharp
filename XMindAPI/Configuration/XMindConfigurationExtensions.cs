@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using XMindAPI.Configuration;
+using XMindAPI.Models;
 using XMindAPI.Writers;
-using XMindAPI.Writers.Util;
+using System.IO;
+using System.Linq;
+using XMindAPI.Zip;
+
 namespace XMindAPI.Extensions
 {
     public static class XMindConfigurationExtensions
@@ -12,19 +16,12 @@ namespace XMindAPI.Extensions
             string? basePath = default,
             bool zip = false)
         {
-            var standardWriters = new List<FileWriterStandardOutput>{
-                FileWriterStandardOutput.Manifest,
-                FileWriterStandardOutput.Meta,
-                FileWriterStandardOutput.Content
-            };
             var result = config
-                .WriteTo.Writers(FileWriterFactory.CreateWriters(standardWriters, basePath))
-                .WriteTo.SetWriterBinding(FileWriterFactory.CreateResolvers(standardWriters));
+                .WriteTo.Writers(FileWriterFactory.CreateStandardWriters(basePath))
+                .WriteTo.SetWriterBinding(FileWriterFactory.CreateStandardResolvers());
             if (zip)
             {
-                throw new NotImplementedException("Need to resolve workbook name from context");
-                // result.WriteTo.SetFinalizeAction(
-                        // FileWriterUtils.ZipXMindFolder(, basePath));
+                result.WriteTo.SetFinalizeAction(CreateZipXMindFolderCallback(basePath));
             }
             return result;
         }
@@ -44,6 +41,40 @@ namespace XMindAPI.Extensions
                 .Writer(
                     new InMemoryWriter(
                         new InMemoryWriterOutputConfig($"[in-memory-writer]")));
+        }
+
+        private static Action<List<XMindWriterContext>, XMindWorkBook> CreateZipXMindFolderCallback(
+            string? basePath)
+        {
+            var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
+            if (basePath == null)
+            {
+                basePath = xMindSettings["output:base"];
+            }
+            var filesToZipLabels = XMindConfigurationLoader
+                .Configuration
+                .GetOutputFilesDefinitions()
+                .Values;
+            return (ctx, workBook) =>
+            {
+                using ZipStorer zip = ZipStorer.Create(Path.Combine(basePath, workBook.Name), string.Empty);
+                var filesToZip = XMindConfigurationLoader
+                    .Configuration
+                    .GetOutputFilesLocations().Where(kvp => filesToZipLabels.Contains(kvp.Key));
+                foreach (var fileToken in filesToZip)
+                {
+                    var fileDir = Path.Combine(basePath, fileToken.Value);
+                    var fullPath = Path.Combine(fileDir, fileToken.Key);
+
+                    zip.AddFile(ZipStorer.Compression.Deflate, fullPath, fileToken.Key, string.Empty);
+                    File.Delete(fullPath);
+                    if (!String.IsNullOrEmpty(fileToken.Value) && Directory.Exists(fileDir))
+                    {
+                        Directory.Delete(fileDir);
+                    }
+                }
+
+            };
         }
 
     }

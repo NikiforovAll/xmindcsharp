@@ -3,6 +3,7 @@ using XMindAPI.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using XMindAPI.Models;
 namespace XMindAPI.Writers.Configuration
 {
     /// <summary>
@@ -10,7 +11,7 @@ namespace XMindAPI.Writers.Configuration
     /// </summary>
     public class XMindWriterConfiguration
     {
-        internal Action<List<XMindWriterContext>> FinalizeAction { get; private set; }
+        internal Action<List<XMindWriterContext>, XMindWorkBook> FinalizeAction { get; private set; }
         private readonly XMindConfiguration _xMindConfiguration;
 
         // internal IXMindWriter MainWriter { get => _writer; set => _writer = value; }
@@ -32,10 +33,10 @@ namespace XMindAPI.Writers.Configuration
         public XMindConfiguration Writers(List<IXMindWriter> writers)
         {
             _writers = writers;
-            foreach (var writer in writers)
-            {
-                //Accept resolver
-            }
+            // foreach (var writer in writers)
+            // {
+            //     //Accept resolver
+            // }
             return _xMindConfiguration;
         }
 
@@ -45,7 +46,7 @@ namespace XMindAPI.Writers.Configuration
             return _xMindConfiguration;
         }
 
-        public XMindConfiguration SetFinalizeAction(Action<List<XMindWriterContext>> action)
+        public XMindConfiguration SetFinalizeAction(Action<List<XMindWriterContext>, XMindWorkBook> action)
         {
             FinalizeAction = action;
             return _xMindConfiguration;

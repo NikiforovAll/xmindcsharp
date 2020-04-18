@@ -43,7 +43,7 @@ namespace XMindAPI.Writers
             {
                 throw new InvalidOperationException();
             }
-            var basePath = (_output as FileWriterOutputConfig).Path;
+            var basePath = fileWriterOutput.Path;
             var fileFullName = Path.Combine(basePath, file);
             Directory.CreateDirectory(basePath);
             // Logger.Info($"FileWriter.WriteToStorage: writing content to {fileFullName}");

@@ -45,12 +45,12 @@ namespace simple
 
         private static async Task SaveWorkBookToFileSystem()
         {
-            string basePath = Path.GetTempPath();
+            string basePath = Path.Combine(Path.GetTempPath(), "xmind-test");
             var bookName = "test.xmind";
             logger.LogInformation(default(EventId), $"Base path: ${Path.Combine(basePath, bookName)}");
             var book = new XMindConfiguration()
-                            .WithFileWriter(basePath, true)
-                            .CreateWorkBook(bookName);
+                .WithFileWriter(basePath, true)
+                .CreateWorkBook(bookName);
             await book.Save();
         }
     }

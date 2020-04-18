@@ -14,7 +14,6 @@ using XMindAPI;
 using XMindAPI.Extensions;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
-using XMindAPI.Writers.Util;
 namespace Tests
 {
     [TestFixture]
@@ -46,14 +45,7 @@ namespace Tests
                         new FileWriter()
                             .SetOutput(new FileWriterOutputConfig(_files[2]).SetBasePath(_customOutputFolderName))
                     })
-                .WriteTo.SetWriterBinding(
-                    //selected based on OutPutName in IXMindWriterOutputConfig
-                    new List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>>{
-                        FileWriterUtils.ResolveManifestFile,
-                        FileWriterUtils.ResolveMetaFile,
-                        FileWriterUtils.ResolveContentFile
-                    }
-                )
+                .WriteTo.SetWriterBinding(FileWriterFactory.CreateStandardResolvers())
                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();
@@ -86,8 +78,8 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath:true,zip: true)
-                .CreateWorkBook(workbookName: "test");
+                .WithFileWriter(useDefaultPath: true, zip: true)
+                .CreateWorkBook(workbookName: "test.xmind");
             //Act
             book.Save();
             //Assert

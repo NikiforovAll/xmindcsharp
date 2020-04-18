@@ -22,7 +22,8 @@ namespace XMindAPI.Models
     /// </summary>
     public class XMindWorkBook : AbstractWorkbook, INodeAdaptableFactory//IWorkbook
     {
-        private readonly XMindConfiguration _globalConfiguration;
+        public string Name { get; set; }
+        private readonly XMindConfiguration _bookConfiguration;
         private readonly IXMindDocumentBuilder _documentBuilder;
 
         private readonly NodeAdaptableRegistry _adaptableRegistry;
@@ -36,11 +37,11 @@ namespace XMindAPI.Models
         /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
         /// </summary>
         // /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
-        internal XMindWorkBook(
-            XMindConfiguration bookConfiguration, IXMindDocumentBuilder builder)
+        internal XMindWorkBook(string name, XMindConfiguration bookConfiguration, IXMindDocumentBuilder builder)
         {
+            Name = name;
             _xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
-            _globalConfiguration = bookConfiguration;
+            this._bookConfiguration = bookConfiguration;
             _documentBuilder = builder;
 
             _documentBuilder.CreateMetaFile();
@@ -51,7 +52,7 @@ namespace XMindAPI.Models
             _adaptableRegistry = new NodeAdaptableRegistry(_documentBuilder.ContentFile, this);
             //Create default sheet if needed
             //TODO:
-            if(DOMUtils.GetFirstElementByTagName(_implementation, TAG_SHEET) == null)
+            if (DOMUtils.GetFirstElementByTagName(_implementation, TAG_SHEET) == null)
             {
                 AddSheet(CreateSheet());
             }
@@ -118,7 +119,7 @@ namespace XMindAPI.Models
                     FileName = kvp.Key,
                     FileEntries = new XDocument[1] { kvp.Value }
                 };
-                var selectedWriters = _globalConfiguration
+                var selectedWriters = _bookConfiguration
                     .WriteTo
                     .ResolveWriters(currentWriterContext);
                 if (selectedWriters == null)
@@ -132,7 +133,7 @@ namespace XMindAPI.Models
                 }
                 writerContexts.Add(currentWriterContext);
             }
-            _globalConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts);
+            _bookConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts, this);
         }
 
         public override IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2)
@@ -173,7 +174,8 @@ namespace XMindAPI.Models
                 childElements.Where((e, i) => i == index)
                     .First()
                     .AddBeforeSelf(elementImplementation);
-            }else
+            }
+            else
             {
                 bookImplementation.Add(elementImplementation);
             }
@@ -191,7 +193,7 @@ namespace XMindAPI.Models
         public override object FindElement(string id, IAdaptable source)
         {
             XNode node = source.GetAdapter<XNode>(typeof(XNode));
-            if(node == null)
+            if (node == null)
             {
                 node = this.GetWorkbookElement();
             }
@@ -252,7 +254,9 @@ namespace XMindAPI.Models
             if (a != null)
             {
                 // Logger.Info($"XMindWorkbook.CreateAdaptable: adaptable is created - {a}");
-            }else{
+            }
+            else
+            {
                 // Logger.Warn($"XMindWorkbook.CreateAdaptable: adaptable was is not created - {a}");
             }
             return a;

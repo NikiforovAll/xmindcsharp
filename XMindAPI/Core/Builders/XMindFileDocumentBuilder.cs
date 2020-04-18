@@ -2,12 +2,11 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using System.IO.Compression;
 using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 
 using XMindAPI.Configuration;
-using XMindAPI.Utils;
+using XMindAPI.Zip;
+using System.Threading.Tasks;
 
 namespace XMindAPI.Core.Builders
 {
@@ -59,6 +58,7 @@ namespace XMindAPI.Core.Builders
         /// <param name="fileName">file name path </param>
         private void Load(string fileName)
         {
+            // TODO: this should be absolute path
             if (String.IsNullOrEmpty(fileName) || !File.Exists(fileName))
             {
                 throw new InvalidOperationException($"XMind file {fileName} is not loaded");
@@ -71,13 +71,10 @@ namespace XMindAPI.Core.Builders
                     "Extension of file is not .xmind"
                 );
             }
-            String tempPath = String.Empty;
+            String tempPath = string.Empty;
             try
             {
-                tempPath = Path.Combine(
-                    Path.GetTempPath(),
-                    Guid.NewGuid().ToString()
-                );
+                tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
                 Directory.CreateDirectory(tempPath);
                 string zipFileName = xMindFileInfo.Name.Replace(".xmind", ".zip");
                 // Make a temporary copy of the XMind file with a .zip extention for J# zip libraries:
@@ -111,8 +108,8 @@ namespace XMindAPI.Core.Builders
                 //     Logger.Info($"FileDocumentBuilder.Load: file {file} extracted from zip");
                 // }
                 var files = XMindConfigurationLoader
-                .Configuration
-                .GetOutputFilesDefinitions();
+                    .Configuration
+                .   GetOutputFilesDefinitions();
                 var fileLocations = XMindConfigurationLoader
                     .Configuration
                     .GetOutputFilesLocations();

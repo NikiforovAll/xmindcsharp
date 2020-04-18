@@ -11,7 +11,6 @@ using XMindAPI.Models;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
 using FluentAssertions;
-using XMindAPI.Writers.Util;
 using XMindAPI.Extensions;
 using System.Collections;
 using XMindAPI.Core;
@@ -88,15 +87,15 @@ namespace Tests
             //Arrange
             var book = new XMindConfiguration()
                 .WithFileWriter(basePath: _customOutputFolderName, zip: true)
-                .CreateWorkBook(workbookName: "test");
+                .CreateWorkBook(workbookName: "test.xmind");
 
-            var writer = (InMemoryWriter)new InMemoryWriter()
-            .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
+            var writer = (InMemoryWriter) new InMemoryWriter()
+                .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
             book.Save();
             var book2 = new XMindConfiguration()
                  .WriteTo
                  .Writer(writer)
-                 .InitializeWorkBook(sourceFileName: Path.Combine(_customOutputFolderName, "build.xmind"), workbookName: "test2");
+                 .LoadWorkBookFromLocation(Path.Combine(_customOutputFolderName, "test.xmind"));
             //Act
             book2.Save();
             //Assert

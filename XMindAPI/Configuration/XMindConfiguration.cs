@@ -1,7 +1,10 @@
+using System;
+using System.IO;
 //TODO: cyclic dependency with XMindAPI.Configuration and XMindAPI.Writers.Configuraiton;
 using XMindAPI.Writers.Configuration;
 using XMindAPI.Core.Builders;
 using XMindAPI.Models;
+using System.Threading.Tasks;
 
 namespace XMindAPI.Configuration
 
@@ -23,21 +26,20 @@ namespace XMindAPI.Configuration
             WriteTo = new XMindWriterConfiguration(this);
         }
 
-        public XMindWorkBook InitializeWorkBook(string workbookName, string sourceFileName, bool loadContent = true)
+        public XMindWorkBook LoadWorkBookFromLocation(string sourceFileLocation)
         {
             // WorkbookName = workbookName;
             // could be replaced with factory method
-            IXMindDocumentBuilder builder = loadContent
-                ? new XMindFileDocumentBuilder(sourceFileName)
-                : new XMindDocumentBuilder();
-            var workbook = new XMindWorkBook(this, builder);
-            // Logger.Info($"Workbook was created: {workbook}");
+            var fi = new FileInfo(sourceFileLocation);
+            if (!fi.Exists)
+            {
+                throw new FileNotFoundException($"{nameof(sourceFileLocation)} is invalid");
+            }
+            var workbook = new XMindWorkBook(fi.Name, this, new XMindFileDocumentBuilder(sourceFileLocation));
             return workbook;
         }
 
-        public XMindWorkBook CreateWorkBook(string workbookName)
-        {
-            return InitializeWorkBook(workbookName, string.Empty, false);
-        }
+        public XMindWorkBook CreateWorkBook(string workbookName) =>
+            new XMindWorkBook(workbookName, this, new XMindDocumentBuilder());
     }
 }
