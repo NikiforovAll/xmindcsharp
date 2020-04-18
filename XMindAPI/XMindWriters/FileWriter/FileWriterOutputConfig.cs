@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-using XMindAPI.Logging;
 using XMindAPI.Configuration;
 
 namespace XMindAPI.Writers
 {
     public class FileWriterOutputConfig : IXMindWriterOutputConfig
     {
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         private readonly bool _useDefaultPath;
-        private string _path;
-        public string Path { get => _path; private set => _path = value; }
+
+        public string Path { get; private set; }
         public string OutputName { get; set; }
 
         public FileWriterOutputConfig(string outputName)
@@ -22,18 +20,19 @@ namespace XMindAPI.Writers
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="outputName">name of the file</param>
         /// <param name="useDefaultPath">build Path based on xmindsettings.json file, basePath (output:base) and file location (output:files:[outputname]) is used</param>
-        public FileWriterOutputConfig(string outputName, bool useDefaultPath):this(outputName)
+        public FileWriterOutputConfig(string outputName, bool useDefaultPath) : this(outputName)
         {
-            if(useDefaultPath){
-                var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+            if (useDefaultPath)
+            {
+                var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
                 var basePath = xMindSettings["output:base"];
-                Dictionary<string, string> locations = XMindConfigurationCache.Configuration.GetOutputFilesLocations();
+                Dictionary<string, string> locations = XMindConfigurationLoader.Configuration.GetOutputFilesLocations();
                 var path = locations[outputName];
-                if(path != null)
+                if (path != null)
                 {
                     Path = System.IO.Path.Combine(basePath, path);
                 }
@@ -44,12 +43,9 @@ namespace XMindAPI.Writers
 
         public IXMindWriterOutputConfig SetBasePath(string path)
         {
-            if (this._useDefaultPath){
-                throw new InvalidOperationException("Not possible to assign new path, default path in use because of FileWriterOutputConfig.useDefaultPath");
-            }
-            if(Path != null)
+            if (this._useDefaultPath)
             {
-                Logger.Warn($"IXMindWriterOutputConfig.Path was overridden: oldValue:{Path}, newValue: {path}");
+                throw new InvalidOperationException("Not possible to assign new path, default path in use because of FileWriterOutputConfig.useDefaultPath");
             }
             Path = path;
             return this;

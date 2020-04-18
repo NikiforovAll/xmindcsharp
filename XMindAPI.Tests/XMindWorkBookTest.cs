@@ -26,41 +26,41 @@ namespace Tests
         private readonly string[] _files = { "manifest.xml", "meta.xml", "content.xml" };
         private readonly bool _isCleanUpNeeded = true;
 
-        [SetUp]
-        public void Setup()
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Sink(new TestCorrelatorSink())
-                .WriteTo.File("book.test.log", retainedFileCountLimit: 3)
-                .CreateLogger();
-        }
+        // [SetUp]
+        // public void Setup()
+        // {
+        //     Log.Logger = new LoggerConfiguration()
+        //         .MinimumLevel.Debug()
+        //         .WriteTo.Sink(new TestCorrelatorSink())
+        //         .WriteTo.File("book.test.log", retainedFileCountLimit: 3)
+        //         .CreateLogger();
+        // }
 
-        [Test]
-        public void Save_CreateEmptyBookWithLogWriter_Success()
-        {
-            //Arrange
-            var book = new XMindConfiguration()
-                 .WriteTo.Writer(new LoggerWriter()
-                         .SetOutput(new LoggerWriterOutputConfig(outputName: "root")))
-                 .WriteTo.SetFinalizeAction(context => Log.Logger.Information("Finalized"))
-                 .CreateWorkBook(workbookName: "test");
+        // [Test]
+        // public void Save_CreateEmptyBookWithLogWriter_Success()
+        // {
+        //     //Arrange
+        //     var book = new XMindConfiguration()
+        //          .WriteTo.Writer(new LoggerWriter()
+        //                  .SetOutput(new LoggerWriterOutputConfig(outputName: "root")))
+        //          .WriteTo.SetFinalizeAction(context => Log.Logger.Information("Finalized"))
+        //          .CreateWorkBook(workbookName: "test");
 
-            using (TestCorrelator.CreateContext())
-            {
-                //Act
-                book.Save();
-                //Assert
-                TestCorrelator.GetLogEventsFromCurrentContext()
-                .Where(e => e.Level == Serilog.Events.LogEventLevel.Information)
-                .Should()
-                .HaveCount(4, "empty book initialization had failed");
+        //     using (TestCorrelator.CreateContext())
+        //     {
+        //         //Act
+        //         book.Save();
+        //         //Assert
+        //         TestCorrelator.GetLogEventsFromCurrentContext()
+        //         .Where(e => e.Level == Serilog.Events.LogEventLevel.Information)
+        //         .Should()
+        //         .HaveCount(4, "empty book initialization had failed");
 
-                TestCorrelator.GetLogEventsFromCurrentContext()
-                    .Where(e => !e.MessageTemplate.ToString().Contains("Finalized", StringComparison.OrdinalIgnoreCase))
-                    .Any(e => e.MessageTemplate.ToString().Contains("root")).Should().BeTrue();
-            }
-        }
+        //         TestCorrelator.GetLogEventsFromCurrentContext()
+        //             .Where(e => !e.MessageTemplate.ToString().Contains("Finalized", StringComparison.OrdinalIgnoreCase))
+        //             .Any(e => e.MessageTemplate.ToString().Contains("root")).Should().BeTrue();
+        //     }
+        // }
 
         [Test]
         public void Save_CreateEmptyBookWithInMemoryWriter_Success()
@@ -87,7 +87,7 @@ namespace Tests
 
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(basePath: _customOutputFolderName, zip: true)
+                .WithFileWriter(basePath: _customOutputFolderName, zip: true)
                 .CreateWorkBook(workbookName: "test");
 
             var writer = (InMemoryWriter)new InMemoryWriter()
@@ -96,7 +96,7 @@ namespace Tests
             var book2 = new XMindConfiguration()
                  .WriteTo
                  .Writer(writer)
-                 .CreateWorkBook(sourceFileName: Path.Combine(_customOutputFolderName, "build.xmind"), workbookName: "test2");
+                 .InitializeWorkBook(sourceFileName: Path.Combine(_customOutputFolderName, "build.xmind"), workbookName: "test2");
             //Act
             book2.Save();
             //Assert
@@ -111,7 +111,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Assert
             book.GetPrimarySheet().Should().NotBeNull("because primary sheet is created by default");
@@ -122,7 +122,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
+                .WithFileWriter(useDefaultPath: true, zip: true)
                 .CreateWorkBook(workbookName: "test");
 
             int numberOfSheets = 2;
@@ -141,7 +141,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             var sheet = book.CreateSheet();
             //Act
@@ -155,7 +155,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             var primarySheet = book.GetPrimarySheet();
             //Act
@@ -169,7 +169,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "FindTopic_Default_Success");
             //Act
             var topic = book.GetPrimarySheet().GetRootTopic();

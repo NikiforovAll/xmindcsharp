@@ -17,14 +17,19 @@ namespace XMindAPI
     {
         public XMindTopic(XElement implementation, XMindWorkBook book)
         {
-            this.OwnedWorkbook = book;
-            this.Implementation = DOMUtils.AddIdAttribute(implementation);
+            OwnedWorkbook = book;
+            Implementation = DOMUtils.AddIdAttribute(implementation);
         }
 
         public IWorkbook OwnedWorkbook { get; }
         public XElement Implementation { get; }
 
         public void AddLabel(string label)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddLabel(int label)
         {
             throw new NotImplementedException();
         }
@@ -79,7 +84,7 @@ namespace XMindAPI
         {
             return Implementation.GetHashCode();
         }
-        
+
         public override string ToString()
         {
             return $"TPC# Id:{GetId()} ({GetTitle()})";

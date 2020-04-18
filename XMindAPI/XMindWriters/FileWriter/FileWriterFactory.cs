@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using XMindAPI.Configuration;
-using static XMindAPI.Configuration.XMindConfigurationCache;
+using static XMindAPI.Configuration.XMindConfiguration;
 using XMindAPI.Writers.Util;
+using XMindAPI.Configuration;
 
 namespace XMindAPI.Writers
 {
@@ -21,7 +21,7 @@ namespace XMindAPI.Writers
         }
         public static IXMindWriter CreateWriterFactoryMethod(FileWriterStandardOutput standardOutputType, string basePath)
         {
-            var xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+            var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
             string fileName = null;
             bool useDefaultPath = basePath == null;
             IXMindWriter result;
@@ -51,7 +51,7 @@ namespace XMindAPI.Writers
             );
             if(!useDefaultPath)
             {
-                var xmindDefaultFileLocation = XMindConfigurationCache.Configuration.GetOutputFilesLocations()[fileName];
+                var xmindDefaultFileLocation = XMindConfigurationLoader.Configuration.GetOutputFilesLocations()[fileName];
                 writerConfig.SetBasePath(
                     System.IO.Path.Combine(basePath, xmindDefaultFileLocation)
                 );

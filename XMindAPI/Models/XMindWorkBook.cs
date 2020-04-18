@@ -2,35 +2,31 @@
 using System;
 
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
 
 using System.Linq;
 using System.Xml.Linq;
-using System.IO;
-using System.IO.Compression;
 
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
-using XMindAPI.Logging;
 using XMindAPI.Core;
 using XMindAPI.Core.Builders;
 using XMindAPI.Core.DOM;
 using static XMindAPI.Core.DOM.DOMConstants;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace XMindAPI.Models
 {
     /// <summary>
-    /// XMindWorkBook encapsulates an XMind workbook and methods for performing actions on workbook content. 
+    /// XMindWorkBook encapsulates an XMind workbook and methods for performing actions on workbook content.
     /// </summary>
     public class XMindWorkBook : AbstractWorkbook, INodeAdaptableFactory//IWorkbook
     {
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         private readonly XMindConfiguration _globalConfiguration;
         private readonly IXMindDocumentBuilder _documentBuilder;
 
-        private NodeAdaptableRegistry _adaptableRegistry;
-        internal readonly XMindConfigurationCache _xMindSettings;
+        private readonly NodeAdaptableRegistry _adaptableRegistry;
+        internal readonly IConfiguration _xMindSettings;
 
         private readonly XElement _implementation;
 
@@ -40,10 +36,11 @@ namespace XMindAPI.Models
         /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
         /// </summary>
         // /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
-        internal XMindWorkBook(XMindConfiguration globalConfiguration, XMindConfigurationCache config, IXMindDocumentBuilder builder)
+        internal XMindWorkBook(
+            XMindConfiguration bookConfiguration, IXMindDocumentBuilder builder)
         {
-            _xMindSettings = config;
-            _globalConfiguration = globalConfiguration;
+            _xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
+            _globalConfiguration = bookConfiguration;
             _documentBuilder = builder;
 
             _documentBuilder.CreateMetaFile();
@@ -100,11 +97,11 @@ namespace XMindAPI.Models
         /// <summary>
         /// Save the current XMind workbook file to disk.
         /// </summary>
-        public override void Save()
+        public override async Task Save()
         {
-            var manifestFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.ManifestLabel];
-            var metaFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.MetaLabel];
-            var contentFileName = _xMindSettings.XMindConfigCollection[XMindConfigurationCache.ContentLabel];
+            var manifestFileName = _xMindSettings[XMindConfiguration.ManifestLabel];
+            var metaFileName = _xMindSettings[XMindConfiguration.MetaLabel];
+            var contentFileName = _xMindSettings[XMindConfiguration.ContentLabel];
 
             var files = new Dictionary<string, XDocument>(3)
             {
@@ -163,7 +160,7 @@ namespace XMindAPI.Models
             var bookImplementation = GetWorkbookElement();
             if (elementImplementation == null)
             {
-                Logger.Warn("XMindWorkbook.AddSheet: sheet is not correct");
+                // Logger.Warn("XMindWorkbook.AddSheet: sheet is not correct");
                 return;
             }
             // if (elementImplementation.Parent != bookImplementation)
@@ -222,12 +219,12 @@ namespace XMindAPI.Models
             var bookImplementation = GetWorkbookElement();
             if (elementImplementation == null)
             {
-                Logger.Warn("XMindWorkbook.RemoveSheet: sheet is not correct");
+                // Logger.Warn("XMindWorkbook.RemoveSheet: sheet is not correct");
                 return;
             }
             if (elementImplementation.Parent != bookImplementation)
             {
-                Logger.Warn("XMindWorkbook.RemoveSheet: sheet must belong to same document");
+                // Logger.Warn("XMindWorkbook.RemoveSheet: sheet must belong to same document");
             }
             var childElements = DOMUtils
                 .GetChildElementsByTag(bookImplementation, TAG_SHEET).ToList();
@@ -254,17 +251,17 @@ namespace XMindAPI.Models
             }
             if (a != null)
             {
-                Logger.Info($"XMindWorkbook.CreateAdaptable: adaptable is created - {a}");
+                // Logger.Info($"XMindWorkbook.CreateAdaptable: adaptable is created - {a}");
             }else{
-                Logger.Warn($"XMindWorkbook.CreateAdaptable: adaptable was is not created - {a}");
+                // Logger.Warn($"XMindWorkbook.CreateAdaptable: adaptable was is not created - {a}");
             }
             return a;
         }
 
-        public override string ToString()
-        {
-            return $"Workbook# {_globalConfiguration.WorkbookName}";
-        }
+        // public override string ToString()
+        // {
+        //     return $"Workbook# {_globalConfiguration.WorkbookName}";
+        // }
 
         internal NodeAdaptableRegistry GetAdaptableRegistry()
         {

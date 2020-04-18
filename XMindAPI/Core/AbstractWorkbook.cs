@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace XMindAPI.Core
 {
@@ -49,6 +50,6 @@ namespace XMindAPI.Core
 
         public abstract void RemoveSheet(ISheet sheet);
 
-        public abstract void Save();
+        public abstract Task Save();
     }
 }

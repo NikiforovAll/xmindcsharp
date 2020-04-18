@@ -14,11 +14,6 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
-            // Log.Logger = new LoggerConfiguration()
-            //     .MinimumLevel.Debug()
-            //     .WriteTo.Sink(new TestCorrelatorSink())
-            //     .WriteTo.File("log.txt")
-            //     .CreateLogger();
         }
 
         [Test]
@@ -27,8 +22,7 @@ namespace Tests
             var config = new XMindConfiguration()
                 .WriteTo
                 .Writer(new LoggerWriter()
-                        .SetOutput(new LoggerWriterOutputConfig("root")));
-           
+                .SetOutput(new LoggerWriterOutputConfig("root")));
         }
     }
 }

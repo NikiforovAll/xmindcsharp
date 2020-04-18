@@ -10,57 +10,57 @@ namespace XMindAPI.Configuration
     /// <summary>
     /// Reads XMindConfiguration from xmindsettings.json file (or memory). It is possible to consume <see cref="IConfiguration"> as singleton via <seealso cref="XMindConfigCollection">
     /// </summary>
-    internal sealed class XMindConfigurationCache
+    internal sealed class XMindConfigurationLoader
     {
-        public IConfiguration XMindConfigCollection { get; private set; }
+        public IConfiguration? XMindConfigCollection { get; private set; }
 
-        public const string ManifestLabel = "output:definition:manifest";
-        public const string MetaLabel = "output:definition:meta";
-        public const string ContentLabel = "output:definition:content";
 
-        public static XMindConfigurationCache Configuration { get { return lazy.Value; } }
-        private static readonly Lazy<XMindConfigurationCache> lazy =
-            new Lazy<XMindConfigurationCache>(
-                    () => new XMindConfigurationCache()
-                        .LoadConfigurationFile()
-                    );
 
-        private XMindConfigurationCache()
+        // TODO: consider to remove lazy instantiated dependency for static field
+        // it is not possible to have control over this thing, nor to manage configuration life time
+        // this should be only used internally, solution to load items temporarily
+        public static XMindConfigurationLoader Configuration { get { return lazy.Value; } }
+        private static readonly Lazy<XMindConfigurationLoader> lazy =
+            new Lazy<XMindConfigurationLoader>(
+                    () => new XMindConfigurationLoader()
+                        .LoadConfigurationFile());
+
+        private XMindConfigurationLoader()
         {
         }
 
         /// <summary>
         /// Allows to get file locations from config xmindsettings.json file
         /// </summary>
-        /// <returns>Mapping between filename to locatoin. [filename => location]</returns>
+        /// <returns>Mapping between filename to location. [filename => location]</returns>
         internal Dictionary<string, string> GetOutputFilesLocations()
         {
+            if(XMindConfigCollection is null) {
+                throw new InvalidOperationException("Output files are not configured");
+            }
             var basePath = XMindConfigCollection["output:base"];
             var sectionGroup = XMindConfigCollection.GetSection("output:files").GetChildren();
-            var result = sectionGroup
-                .ToDictionary(
-                    s => s.GetChildren()
-                        .FirstOrDefault(kvp => kvp.Key == "name").Value,
-                    s => s.GetChildren().
-                        FirstOrDefault(kvp => kvp.Key == "location").Value
+            var result = sectionGroup.ToDictionary(
+                    s => s.GetChildren().FirstOrDefault(kvp => kvp.Key == "name").Value,
+                    s => s.GetChildren().FirstOrDefault(kvp => kvp.Key == "location").Value
                 );
             return result;
         }
 
         /// <summary>
-        /// Entry point for configuration for working with main files. 
+        /// Entry point for configuration for working with main files.
         /// </summary>
         /// <returns>Mapping between manifest config token (label) to filename. [label => filename]</returns>
         internal Dictionary<string, string> GetOutputFilesDefinitions()
         {
             return new Dictionary<string, string>
             {
-                [ManifestLabel] = Configuration.XMindConfigCollection[ManifestLabel],
-                [MetaLabel] = Configuration.XMindConfigCollection[MetaLabel],
-                [ContentLabel] = Configuration.XMindConfigCollection[ContentLabel]
+                [XMindConfiguration.ManifestLabel] = XMindConfigCollection[XMindConfiguration.ManifestLabel],
+                [XMindConfiguration.MetaLabel] = XMindConfigCollection[XMindConfiguration.MetaLabel],
+                [XMindConfiguration.ContentLabel] = XMindConfigCollection[XMindConfiguration.ContentLabel]
             };
         }
-        private XMindConfigurationCache LoadConfigurationFile()
+        private XMindConfigurationLoader LoadConfigurationFile()
         {
             try
             {
@@ -83,7 +83,7 @@ namespace XMindAPI.Configuration
                 }
                 XMindConfigCollection = builder.Build();
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 // TODO: remove and add proper exception handling
                 throw;

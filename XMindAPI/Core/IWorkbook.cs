@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace XMindAPI.Core
 {
@@ -46,7 +47,7 @@ namespace XMindAPI.Core
         /// </summary>
         /// <returns></returns>
         ITopic FindTopic(string id);
-        
+
         // IManifest GetManifest()
         // IMeta GetMate()
 
@@ -54,7 +55,7 @@ namespace XMindAPI.Core
         /// Saves workbook based on <see cref="Configuration.XMindConfiguration"/>
         /// <seealso cref="Writers.Configuration.XMindWriterConfiguration"/>
         /// </summary>
-        void Save();
+        Task Save();
         IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2);
         IRelationship CreateRelationship();
     }

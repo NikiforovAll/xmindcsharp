@@ -6,7 +6,6 @@ using System.IO.Compression;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 
-using XMindAPI.Logging;
 using XMindAPI.Configuration;
 using XMindAPI.Utils;
 
@@ -14,9 +13,7 @@ namespace XMindAPI.Core.Builders
 {
     internal class XMindFileDocumentBuilder : XMindDocumentBuilder
     {
-        protected readonly IConfiguration xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
-        private static readonly ILog Logger = LogProvider
-            .GetCurrentClassLogger();
+        // protected readonly IConfiguration xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
         private readonly string _sourceFileName;
         private bool _isLoaded = false;
 
@@ -67,7 +64,7 @@ namespace XMindAPI.Core.Builders
                 throw new InvalidOperationException($"XMind file {fileName} is not loaded");
             }
             FileInfo xMindFileInfo = new FileInfo(fileName);
-            Logger.Info($"XMindFile loaded: {xMindFileInfo.FullName}");
+            // Logger.Info($"XMindFile loaded: {xMindFileInfo.FullName}");
             if (xMindFileInfo.Extension.ToLower() != ".xmind")
             {
                 throw new InvalidOperationException(
@@ -85,7 +82,7 @@ namespace XMindAPI.Core.Builders
                 string zipFileName = xMindFileInfo.Name.Replace(".xmind", ".zip");
                 // Make a temporary copy of the XMind file with a .zip extention for J# zip libraries:
                 string tempSourceFileName = Path.Combine(tempPath, zipFileName);
-                Logger.Info($"Read from: {tempSourceFileName}");
+                // Logger.Info($"Read from: {tempSourceFileName}");
                 File.Copy(fileName, tempSourceFileName);
                 // Make sure the .zip temporary file is not read only
                 // TODO: delete it later
@@ -93,8 +90,7 @@ namespace XMindAPI.Core.Builders
                 List<string> fileNamesExtracted = new List<string>(3);
                 using (ZipStorer zip = ZipStorer.Open(tempSourceFileName, FileAccess.Read))
                 {
-                    Dictionary<string, string> locations = XMindConfigurationCache
-                        .Configuration
+                    Dictionary<string, string> locations = XMindConfigurationLoader.Configuration
                         .GetOutputFilesLocations();
                     // Read the central directory collection
                     foreach (ZipStorer.ZipFileEntry entry in zip.ReadCentralDir())
@@ -110,20 +106,20 @@ namespace XMindAPI.Core.Builders
                     }
                     zip.Close();
                 }
-                foreach (var file in fileNamesExtracted)
-                {
-                    Logger.Info($"FileDocumentBuilder.Load: file {file} extracted from zip");
-                }
-                var files = XMindConfigurationCache
+                // foreach (var file in fileNamesExtracted)
+                // {
+                //     Logger.Info($"FileDocumentBuilder.Load: file {file} extracted from zip");
+                // }
+                var files = XMindConfigurationLoader
                 .Configuration
                 .GetOutputFilesDefinitions();
-                var fileLocations = XMindConfigurationCache
+                var fileLocations = XMindConfigurationLoader
                     .Configuration
                     .GetOutputFilesLocations();
 
-                var manifestFileName = files[XMindConfigurationCache.ManifestLabel];
-                var metaFileName = files[XMindConfigurationCache.MetaLabel];
-                var contentFileName = files[XMindConfigurationCache.ContentLabel];
+                var manifestFileName = files[XMindConfiguration.ManifestLabel];
+                var metaFileName = files[XMindConfiguration.MetaLabel];
+                var contentFileName = files[XMindConfiguration.ContentLabel];
 
                 Dictionary<string, XDocument> docs = new Dictionary<string, XDocument>();
                 foreach (var fileToken in files)
@@ -133,9 +129,9 @@ namespace XMindAPI.Core.Builders
                         XDocument.Parse(File.ReadAllText(Path.Combine(tempPath, fileLocations[fileToken.Value], fileToken.Value)))
                     );
                 }
-                this.metaData = docs[XMindConfigurationCache.MetaLabel];
-                this.manifestData = docs[XMindConfigurationCache.ManifestLabel];
-                this.contentData = docs[XMindConfigurationCache.ContentLabel];
+                this.metaData = docs[XMindConfiguration.MetaLabel];
+                this.manifestData = docs[XMindConfiguration.ManifestLabel];
+                this.contentData = docs[XMindConfiguration.ContentLabel];
             }
             finally
             {

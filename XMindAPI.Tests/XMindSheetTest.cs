@@ -34,7 +34,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Act
             var sheet = book.CreateSheet();
@@ -49,7 +49,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
+                .WithFileWriter(useDefaultPath: true, zip: true)
                 .CreateWorkBook(workbookName: "test");
             string title = "Awesome sheet";
             //Act
@@ -65,7 +65,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
+                .WithFileWriter(useDefaultPath: true, zip: true)
                 .CreateWorkBook(workbookName: "test");
             var topic = book.CreateTopic();
             //Act

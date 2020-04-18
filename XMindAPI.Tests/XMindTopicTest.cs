@@ -36,7 +36,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: true)
+                .WithFileWriter(useDefaultPath: true, zip: true)
                 .CreateWorkBook(workbookName: "test");
             string title = "Awesome topic";
             //Act

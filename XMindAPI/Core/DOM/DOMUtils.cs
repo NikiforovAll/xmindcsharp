@@ -3,13 +3,11 @@ using System.Xml.Linq;
 using System.Linq;
 using static XMindAPI.Core.DOM.DOMConstants;
 using System.Collections.Generic;
-using XMindAPI.Logging;
 
 namespace XMindAPI.Core.DOM
 {
     internal class DOMUtils
     {
-    private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
         internal static XElement AddIdAttribute(XElement element)
         {
@@ -44,7 +42,7 @@ namespace XMindAPI.Core.DOM
             return result;
         }
 
-        
+
         internal static List<T> GetChildList<T>(XElement element, string  childTag, NodeAdaptableRegistry registry) where T : IAdaptable
         {
             List<T> result = new List<T>();
@@ -108,8 +106,8 @@ namespace XMindAPI.Core.DOM
 
         internal static XElement CreateElement(XNode node, string tagName)
         {
-            XDocument doc = node.NodeType == System.Xml.XmlNodeType.Document ? 
-                node as XDocument : 
+            XDocument doc = node.NodeType == System.Xml.XmlNodeType.Document ?
+                node as XDocument :
                 node.Document;
             //TODO: differs from Java implementation
             var innerElement = new XElement(tagName);
@@ -130,7 +128,7 @@ namespace XMindAPI.Core.DOM
             }
             if(element == null)
             {
-                Logger.Info($"EnsureChildElement.CreateElement: item {tagName}was created for {parent.NodeType}");   
+                // Logger.Info($"EnsureChildElement.CreateElement: item {tagName}was created for {parent.NodeType}");
                 CreateElement(parent, tagName);
             }
             return element;

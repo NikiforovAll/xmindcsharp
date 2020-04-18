@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using XMindAPI.Logging;
 using static XMindAPI.Core.DOM.DOMConstants;
 
 namespace XMindAPI.Core.DOM
 {
     internal class NodeAdaptableRegistry
     {
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         private XDocument _defaultDocument;
         private readonly INodeAdaptableFactory _factory;
         private Dictionary<IDKey, IAdaptable> _idMap = new Dictionary<IDKey, IAdaptable>();
@@ -25,14 +23,14 @@ namespace XMindAPI.Core.DOM
 
         public IAdaptable GetAdaptableById(String id, XDocument document)
         {
-            Logger.Info($"NodeAdaptableRegistry.GetAdaptableById: Getting element by Id: {id}");
+            // Logger.Info($"NodeAdaptableRegistry.GetAdaptableById: Getting element by Id: {id}");
             if(!_idMap.TryGetValue(GetIDKey(id, document), out var result))
                 return null;
             return result;
         }
         public IAdaptable GetAdaptableByNode(XNode node)
         {
-            Logger.Info($"NodeAdaptableRegistry.GetAdaptableById: Getting element by Node: {node.NodeType}");
+            // Logger.Info($"NodeAdaptableRegistry.GetAdaptableById: Getting element by Node: {node.NodeType}");
             return _nodeMap[node];
         }
         public IAdaptable GetAdaptable(string id)
@@ -83,7 +81,7 @@ namespace XMindAPI.Core.DOM
         }
         public void RegisterById(IAdaptable adaptable, string id, XDocument document)
         {
-            Logger.Info($"NodeAdaptableRegistry.RegisterById: item was registered {adaptable}");
+            // Logger.Info($"NodeAdaptableRegistry.RegisterById: item was registered {adaptable}");
             _idMap.Add(CreateIDKey(id, document), adaptable);
         }
 
@@ -92,14 +90,14 @@ namespace XMindAPI.Core.DOM
             IDKey key = GetIDKey(id, document);
             if (_idMap.TryGetValue(key, out IAdaptable a) && a.Equals(adaptable))
             {
-                Logger.Info($"NodeAdaptableRegistry.UnregisterById: item was unregistered {adaptable}");
+                // Logger.Info($"NodeAdaptableRegistry.UnregisterById: item was unregistered {adaptable}");
                 _idMap.Remove(key);
             }
         }
 
         public void RegisterByNode(IAdaptable adaptable, XNode node)
         {
-            Logger.Info($"NodeAdaptableRegistry.RegisterByNode: item was registered {adaptable}");
+            // Logger.Info($"NodeAdaptableRegistry.RegisterByNode: item was registered {adaptable}");
             _nodeMap.Add(node, adaptable);
         }
         public void UnregisterByNode(IAdaptable adaptable, XNode node)
@@ -107,7 +105,7 @@ namespace XMindAPI.Core.DOM
             IAdaptable a = _nodeMap[node];
             if (a == adaptable || (a != null && a.Equals(adaptable)))
             {
-                Logger.Info($"NodeAdaptableRegistry.UnregisterByNode: item was unregistered {adaptable}");
+                // Logger.Info($"NodeAdaptableRegistry.UnregisterByNode: item was unregistered {adaptable}");
                 _nodeMap.Remove(node);
             }
         }

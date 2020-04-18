@@ -5,22 +5,20 @@ using System.Xml.Linq;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-using XMindAPI.Logging;
 using XMindAPI.Configuration;
 namespace XMindAPI.Core.Builders
 {
     internal class XMindDocumentBuilder : IXMindDocumentBuilder
     {
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
-        protected readonly IConfiguration xMindSettings = XMindConfigurationCache.Configuration.XMindConfigCollection;
+        protected readonly IConfiguration xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
 
-        protected XDocument manifestData = null;
-        protected XDocument metaData = null;
-        protected XDocument contentData = null;
+        protected XDocument? manifestData;
+        protected XDocument? metaData;
+        protected XDocument? contentData;
 
-        public XDocument MetaFile { get => metaData; }
-        public XDocument ManifestFile { get => manifestData;}
-        public XDocument ContentFile { get => contentData; }
+        public XDocument MetaFile { get => metaData ?? throw new InvalidOperationException($"{nameof(metaData)} is not loaded"); }
+        public XDocument ManifestFile { get => manifestData?? throw new InvalidOperationException($"{nameof(manifestData)} is not loaded"); }
+        public XDocument ContentFile { get => contentData?? throw new InvalidOperationException($"{nameof(contentData)} is not loaded"); }
 
         public XMindDocumentBuilder()
         {
@@ -58,24 +56,26 @@ namespace XMindAPI.Core.Builders
 
         private XDocument CreateDefaultManifestFile()
         {
-            var files = XMindConfigurationCache
+            var files = XMindConfigurationLoader
                 .Configuration
                 .GetOutputFilesDefinitions();
-            var fileLocations = XMindConfigurationCache
+            var fileLocations = XMindConfigurationLoader
                 .Configuration
                 .GetOutputFilesLocations();
-            var manifest = new XDocument();
-            manifest.Declaration = new XDeclaration("1.0", "UTF-8", "no");
+            var manifest = new XDocument
+            {
+                Declaration = new XDeclaration("1.0", "UTF-8", "no")
+            };
             var manifestNamespace = XNamespace.Get(xMindSettings["manifestNamespace"]);
             var manifestFileEntryToken = manifestNamespace + "file-entry";
             XElement rootElement = new XElement(manifestNamespace + "manifest");
             rootElement.Add(
                 new XElement(manifestFileEntryToken,
-                    new XAttribute("full-path", files[XMindConfigurationCache.ContentLabel]),
+                    new XAttribute("full-path", files[XMindConfiguration.ContentLabel]),
                     new XAttribute("media-type", "text/xml")
                 ));
 
-            var manifestFileName = files[XMindConfigurationCache.ManifestLabel];
+            var manifestFileName = files[XMindConfiguration.ManifestLabel];
             var manifestFilePath = fileLocations[manifestFileName];
             rootElement.Add(
                 new XElement(manifestFileEntryToken,
@@ -101,7 +101,7 @@ namespace XMindAPI.Core.Builders
 
         private XDocument CreateDefaultContentFile()
         {
-            
+
             var content = new XDocument();
             XNamespace ns2 = XNamespace.Get(xMindSettings["standardContentNamespaces:xsl"]);
             XNamespace ns3 = XNamespace.Get(xMindSettings["standardContentNamespaces:svg"]);

@@ -32,7 +32,7 @@ namespace Tests
         {
             XMindDocumentBuilder build = new XMindDocumentBuilder();
             XDocument doc = build.CreateMetaFile();
-            doc.ToString().Should().Be("<meta version=\"2.0\" xmlns=\"urn:xmind:xmap:xmlns:meta:2.0\" />");
+            doc.ToString().Should().Be(@"<meta version=""2.0"" xmlns=""urn:xmind:xmap:xmlns:meta:2.0"" />");
         }
 
         [Test]
@@ -51,4 +51,4 @@ namespace Tests
             doc.Should().NotBeNull();
         }
     }
-}   
+}

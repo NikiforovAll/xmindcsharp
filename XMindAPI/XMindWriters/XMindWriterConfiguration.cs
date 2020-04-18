@@ -1,6 +1,5 @@
 // using XMindAPI.Writers;
 using XMindAPI.Configuration;
-using XMindAPI.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +10,9 @@ namespace XMindAPI.Writers.Configuration
     /// </summary>
     public class XMindWriterConfiguration
     {
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
-        internal Action<List<XMindWriterContext>> FinalizeAction { get => _finalizeAction; private set => _finalizeAction = value; }
+        internal Action<List<XMindWriterContext>> FinalizeAction { get; private set; }
         private readonly XMindConfiguration _xMindConfiguration;
-        private Action<List<XMindWriterContext>> _finalizeAction; 
-        
+
         // internal IXMindWriter MainWriter { get => _writer; set => _writer = value; }
         private List<IXMindWriter> _writers;
 
@@ -61,11 +58,11 @@ namespace XMindAPI.Writers.Configuration
                 throw new InvalidOperationException("XMindConfiguration.ResolveWriter: Writer is not specified");
             }
             if(_criteria == null){
-                    Logger.WarnFormat("XMindConfiguration.ResolveWriter: default writer is assigned");
+                    // Logger.WarnFormat("XMindConfiguration.ResolveWriter: default writer is assigned");
                     return _writers.Take(1).ToList();
-            } 
+            }
             var writersFound = _criteria.Select(w => w.Invoke(context, _writers)).Where(w => w != null);
-            Logger.Debug($"For context.FileName: {context.FileName} ResolveWriters.writersFound: {writersFound.Count()}");
+            // Logger.Debug($"For context.FileName: {context.FileName} ResolveWriters.writersFound: {writersFound.Count()}");
             return writersFound.ToList();
         }
 

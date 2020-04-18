@@ -4,19 +4,17 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using XMindAPI;
-using XMindAPI.Logging;
 
 namespace XMindAPI.Writers
 {
     public class FileWriter : IXMindWriter
     {
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         // private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
         // private IConfiguration _xMindSettings;
         internal IXMindWriterOutputConfig _output;
 
-        internal readonly bool _isAutoAddedResolver = false; 
+        internal readonly bool _isAutoAddedResolver = false;
         internal readonly FileWriterStandardOutput _fileWriterStandardOutput;
         public FileWriter(FileWriterStandardOutput standardOutput)
         {
@@ -48,7 +46,7 @@ namespace XMindAPI.Writers
             var basePath = (_output as FileWriterOutputConfig).Path;
             var fileFullName = Path.Combine(basePath, file);
             Directory.CreateDirectory(basePath);
-            Logger.Info($"FileWriter.WriteToStorage: writing content to {fileFullName}");
+            // Logger.Info($"FileWriter.WriteToStorage: writing content to {fileFullName}");
             File.WriteAllText(fileFullName, document.ToString());
         }
 

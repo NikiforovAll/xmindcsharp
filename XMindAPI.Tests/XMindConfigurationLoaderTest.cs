@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System;
 using FluentAssertions;
 using System.Collections.Generic;
 
@@ -7,7 +6,7 @@ using XMindAPI.Configuration;
 namespace Tests
 {
     [TestFixture]
-    public class XMindConfigurationCacheTest
+    public class XMindConfigurationLoaderTest
     {
         [SetUp]
         public void Setup()
@@ -24,7 +23,7 @@ namespace Tests
         {
             //TODO: this is not something we want to test since it depends on config
             //Act
-            IDictionary<string, string> locations = XMindConfigurationCache
+            IDictionary<string, string> locations = XMindConfigurationLoader
                 .Configuration.GetOutputFilesLocations();
             //Assert
             locations.Should().NotBeEmpty();

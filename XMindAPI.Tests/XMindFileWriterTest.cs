@@ -70,7 +70,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(useDefaultPath: true, zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();
@@ -86,7 +86,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .SetUpXMindWithFileWriter(useDefaultPath:true,zip: true)
+                .WithFileWriter(useDefaultPath:true,zip: true)
                 .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();

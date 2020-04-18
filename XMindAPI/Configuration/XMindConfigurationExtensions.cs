@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
@@ -6,9 +7,9 @@ namespace XMindAPI.Extensions
 {
     public static class XMindConfigurationExtensions
     {
-        public static XMindConfiguration SetUpXMindWithFileWriter(
+        public static XMindConfiguration WithFileWriter(
             this XMindConfiguration config,
-            string basePath = null,
+            string? basePath = default,
             bool zip = false)
         {
             var standardWriters = new List<FileWriterStandardOutput>{
@@ -17,25 +18,32 @@ namespace XMindAPI.Extensions
                 FileWriterStandardOutput.Content
             };
             var result = config
-                .WriteTo
-                    .Writers(FileWriterFactory.CreateWriters(standardWriters, basePath))
-                .WriteTo
-                    .SetWriterBinding(FileWriterFactory.CreateResolvers(standardWriters));
+                .WriteTo.Writers(FileWriterFactory.CreateWriters(standardWriters, basePath))
+                .WriteTo.SetWriterBinding(FileWriterFactory.CreateResolvers(standardWriters));
             if (zip)
             {
-                result.WriteTo
-                    .SetFinalizeAction(
-                        FileWriterUtils.ZipXMindFolder("build.xmind", basePath)
-                    );
+                throw new NotImplementedException("Need to resolve workbook name from context");
+                // result.WriteTo.SetFinalizeAction(
+                        // FileWriterUtils.ZipXMindFolder(, basePath));
             }
             return result;
         }
-        public static XMindConfiguration SetUpXMindWithFileWriter(
+        public static XMindConfiguration WithFileWriter(
             this XMindConfiguration config,
             bool useDefaultPath,
-            bool zip = false)
+            bool zip = true)
         {
-            return config.SetUpXMindWithFileWriter(basePath: null, zip: zip);
+            return config.WithFileWriter(basePath: null, zip: zip);
+        }
+
+        public static XMindConfiguration WithInMemoryWriter(
+            this XMindConfiguration config
+        )
+        {
+            return config.WriteTo
+                .Writer(
+                    new InMemoryWriter(
+                        new InMemoryWriterOutputConfig($"[in-memory-writer]")));
         }
 
     }
