@@ -7,7 +7,7 @@ using XMindAPI.Core.DOM;
 using XMindAPI.Models;
 using static XMindAPI.Core.DOM.DOMConstants;
 
-namespace XMindAPI
+namespace XMindAPI.Models
 {
 
     /// <summary>

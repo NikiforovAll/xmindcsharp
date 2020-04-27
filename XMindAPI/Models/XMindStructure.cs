@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 
-namespace XMindAPI
+namespace XMindAPI.Models
 {
     /// <summary>
     /// XMindStructure defines the different types of diagrams that can be drawn. Its implemented through the AddCentralTopic() method.

@@ -1,4 +1,4 @@
-# XMindCSharp [![AppVeyor Badge](https://ci.appveyor.com/api/projects/status/xtmsp1i4ot8j6tbs?svg=true)](https://ci.appveyor.com/project/NikiforovAll/xmindcsharp/branch/master) [![NuGet Badge](https://buildstats.info/nuget/xmindcsharp)](https://www.nuget.org/packages/xmindcsharp/) [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+# XMindCSharp [![AppVeyor Badge](https://ci.appveyor.com/api/projects/status/xtmsp1i4ot8j6tbs?svg=true)](https://ci.appveyor.com/project/NikiforovAll/xmindcsharp/branch/master) [![NuGet Badge](https://buildstats.info/nuget/xmindcsharp)](https://www.nuget.org/packages/xmindcsharp/) [![XMindCSharp on fuget.org](https://www.fuget.org/packages/XMindCSharp/badge.svg)](https://www.fuget.org/packages/XMindCSharp) [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 XMind API that allows to build .xmind files programmatically
 

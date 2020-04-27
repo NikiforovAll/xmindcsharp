@@ -13,7 +13,7 @@ namespace XMindAPI.Zip
     /// <summary>
     /// Unique class for compression/decompression file. Represents a Zip file.
     /// </summary>
-    public class ZipStorer : IDisposable
+    internal class ZipStorer : IDisposable
     {
         /// <summary>
         /// Compression method enumeration

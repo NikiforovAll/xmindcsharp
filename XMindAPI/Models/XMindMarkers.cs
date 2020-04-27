@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-namespace XMindAPI
+namespace XMindAPI.Models
 {
     /// <summary>
     /// XMindMarkers define optional markers that can be added to topics. Markers are displayed right in front of the topic title.
