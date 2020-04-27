@@ -14,6 +14,8 @@ using XMindAPI;
 using XMindAPI.Extensions;
 using XMindAPI.Configuration;
 using XMindAPI.Writers;
+using System.Threading.Tasks;
+
 namespace Tests
 {
     [TestFixture]
@@ -36,7 +38,7 @@ namespace Tests
 
             var book = new XMindConfiguration()
                 .WriteTo.Writers(
-                    new List<IXMindWriter>{
+                    new List<IXMindWriter<IXMindWriterOutputConfig>>{
                         new FileWriter()
                             .SetOutput(new FileWriterOutputConfig(_files[0])
                                 .SetBasePath(Path.Combine(_customOutputFolderName, "META-INF"))),
@@ -74,14 +76,14 @@ namespace Tests
                 .All(x => true);
         }
         [Test]
-        public void Save_CreateEmptyBookWithFileWriterWithDefaultPathAndZip_Success()
+        public async Task Save_CreateEmptyBookWithFileWriterWithDefaultPathAndZip_Success()
         {
             //Arrange
             var book = new XMindConfiguration()
                 .WithFileWriter(useDefaultPath: true, zip: true)
                 .CreateWorkBook(workbookName: "test.xmind");
             //Act
-            book.Save();
+            await book.Save();
             //Assert
             DirectoryInfo di = new DirectoryInfo(_xmindOutputFolderName);
             di.GetFileSystemInfos("*.xmind").Should().ContainSingle();

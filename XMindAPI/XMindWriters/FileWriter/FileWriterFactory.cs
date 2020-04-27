@@ -11,7 +11,7 @@ namespace XMindAPI.Writers
     public class FileWriterFactory
     {
 
-        public static List<IXMindWriter> CreateStandardWriters(string basePath)
+        public static List<IXMindWriter<IXMindWriterOutputConfig>> CreateStandardWriters(string basePath)
         {
             var standardOutputs = new List<FileWriterStandardOutput>{
                 FileWriterStandardOutput.Manifest,
@@ -20,7 +20,7 @@ namespace XMindAPI.Writers
             };
             return standardOutputs.Select(o => CreateStandardWriterFactoryMethod(o, basePath)).ToList();
         }
-        public static List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>> CreateStandardResolvers()
+        public static List<Func<XMindWriterContext, List<IXMindWriter<IXMindWriterOutputConfig>>, IXMindWriter<IXMindWriterOutputConfig>>> CreateStandardResolvers()
         {
             var standardOutputs = new List<FileWriterStandardOutput>{
                 FileWriterStandardOutput.Manifest,
@@ -29,7 +29,7 @@ namespace XMindAPI.Writers
             };
             return standardOutputs.Select(o => CreateResolverFactoryMethod(o)).ToList();
         }
-        public static IXMindWriter CreateStandardWriterFactoryMethod(
+        public static IXMindWriter<IXMindWriterOutputConfig> CreateStandardWriterFactoryMethod(
             FileWriterStandardOutput standardOutputType, string basePath)
         {
             var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
@@ -42,7 +42,7 @@ namespace XMindAPI.Writers
                 _ => throw new InvalidOperationException("CreateWriterFactoryMethod haven't assigned writer")
             };
             bool useDefaultPath = basePath == null;
-            IXMindWriter result;
+            IXMindWriter<IXMindWriterOutputConfig> result;
 
             var writerConfig = new FileWriterOutputConfig(fileName, useDefaultPath);
             if (!useDefaultPath)
@@ -55,7 +55,7 @@ namespace XMindAPI.Writers
             return result;
         }
 
-        public static Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter> CreateResolverFactoryMethod(FileWriterStandardOutput standardOutputType) => standardOutputType switch
+        public static Func<XMindWriterContext, List<IXMindWriter<IXMindWriterOutputConfig>>, IXMindWriter<IXMindWriterOutputConfig>> CreateResolverFactoryMethod(FileWriterStandardOutput standardOutputType) => standardOutputType switch
         {
             FileWriterStandardOutput.Manifest =>
                 (ctx, writers) => ResolveWriterByOutputName(ctx, writers, ManifestLabel),
@@ -66,9 +66,9 @@ namespace XMindAPI.Writers
             _ => throw new InvalidOperationException("CreateResolverFactoryMethod haven't assigned binding")
         };
 
-        private static IXMindWriter ResolveWriterByOutputName(
+        private static IXMindWriter<IXMindWriterOutputConfig> ResolveWriterByOutputName(
             XMindWriterContext context,
-            List<IXMindWriter> writers,
+            List<IXMindWriter<IXMindWriterOutputConfig>> writers,
             string fileLabel)
         {
             var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;

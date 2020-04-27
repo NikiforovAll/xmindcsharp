@@ -68,12 +68,11 @@ namespace XMindAPI.Extensions
 
                     zip.AddFile(ZipStorer.Compression.Deflate, fullPath, fileToken.Key, string.Empty);
                     File.Delete(fullPath);
-                    if (!String.IsNullOrEmpty(fileToken.Value) && Directory.Exists(fileDir))
+                    if (!string.IsNullOrEmpty(fileToken.Value) && Directory.Exists(fileDir))
                     {
                         Directory.Delete(fileDir);
                     }
                 }
-
             };
         }
 

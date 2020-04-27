@@ -1,4 +1,5 @@
 
+using System.Net.Mime;
 using System;
 using System.IO;
 using System.Xml.Linq;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using XMindAPI.Configuration;
 using XMindAPI.Zip;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 
 namespace XMindAPI.Core.Builders
 {
@@ -18,7 +20,7 @@ namespace XMindAPI.Core.Builders
 
         public XMindFileDocumentBuilder(string sourceFileName)
         {
-            this._sourceFileName = sourceFileName;
+            _sourceFileName = sourceFileName;
             if (!_isLoaded)
             {
                 // TODO: bad approach, IO shouldn't be in ctor
@@ -26,31 +28,22 @@ namespace XMindAPI.Core.Builders
                 _isLoaded = true;
             }
         }
-        public override XDocument CreateMetaFile()
-        {
-            if (this.metaData == null)
-            {
-                throw new InvalidOperationException("CreateMetaFile: Meta file is not initialized. Invoke Load()");
-            }
-            return this.metaData;
-        }
-        public override XDocument CreateManifestFile()
-        {
-            if (this.manifestData == null)
-            {
-                throw new InvalidOperationException("CreateMetaFile: Meta file is not initialized. Invoke Load()");
-            }
-            return this.manifestData;
-        }
+        // public override XDocument CreateMetaFile()
+        // {
+        //     Guard.Against.Null(metaData, nameof(metaData));
+        //     return metaData;
+        // }
+        // public override XDocument CreateManifestFile()
+        // {
+        //     Guard.Against.Null(manifestData, nameof(manifestData));
+        //     return manifestData;
+        // }
 
-        public override XDocument CreateContentFile()
-        {
-            if (this.contentData == null)
-            {
-                throw new InvalidOperationException("CreateMetaFile: Meta file is not initialized. Invoke Load()");
-            }
-            return this.contentData;
-        }
+        // public override XDocument CreateContentFile()
+        // {
+        //     Guard.Against.Null(contentData, nameof(contentData));
+        //     return contentData;
+        // }
 
         /// <summary>
         /// Loads XMind workbook from drive
@@ -59,7 +52,7 @@ namespace XMindAPI.Core.Builders
         private void Load(string fileName)
         {
             // TODO: this should be absolute path
-            if (String.IsNullOrEmpty(fileName) || !File.Exists(fileName))
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
             {
                 throw new InvalidOperationException($"XMind file {fileName} is not loaded");
             }
@@ -71,7 +64,7 @@ namespace XMindAPI.Core.Builders
                     "Extension of file is not .xmind"
                 );
             }
-            String tempPath = string.Empty;
+            var tempPath = string.Empty;
             try
             {
                 tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -109,7 +102,7 @@ namespace XMindAPI.Core.Builders
                 // }
                 var files = XMindConfigurationLoader
                     .Configuration
-                .   GetOutputFilesDefinitions();
+                    .GetOutputFilesDefinitions();
                 var fileLocations = XMindConfigurationLoader
                     .Configuration
                     .GetOutputFilesLocations();
@@ -121,14 +114,14 @@ namespace XMindAPI.Core.Builders
                 Dictionary<string, XDocument> docs = new Dictionary<string, XDocument>();
                 foreach (var fileToken in files)
                 {
-                    docs.Add(
-                        fileToken.Key,
-                        XDocument.Parse(File.ReadAllText(Path.Combine(tempPath, fileLocations[fileToken.Value], fileToken.Value)))
-                    );
+                    string path = Path.Combine(tempPath, fileLocations[fileToken.Value], fileToken.Value);
+                    // string text = File.ReadAllText(path);
+                    // docs.Add(fileToken.Key, XDocument.Parse(text));
+                    docs.Add(fileToken.Key, XDocument.Load(path));
                 }
-                this.metaData = docs[XMindConfiguration.MetaLabel];
-                this.manifestData = docs[XMindConfiguration.ManifestLabel];
-                this.contentData = docs[XMindConfiguration.ContentLabel];
+                metaData = docs[XMindConfiguration.MetaLabel];
+                manifestData = docs[XMindConfiguration.ManifestLabel];
+                contentData = docs[XMindConfiguration.ContentLabel];
             }
             finally
             {

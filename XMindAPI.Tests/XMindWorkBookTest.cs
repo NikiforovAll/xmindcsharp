@@ -1,19 +1,12 @@
-using NUnit.Framework;
-using System;
-using System.IO;
-using System.Xml.Linq;
-using System.Linq;
-using System.Collections.Generic;
-using Serilog;
-using Serilog.Sinks.TestCorrelator;
-using XMindAPI;
-using XMindAPI.Models;
-using XMindAPI.Configuration;
-using XMindAPI.Writers;
 using FluentAssertions;
+using NUnit.Framework;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using XMindAPI.Configuration;
 using XMindAPI.Extensions;
-using System.Collections;
-using XMindAPI.Core;
+using XMindAPI.Models;
+using XMindAPI.Writers;
 
 namespace Tests
 {
@@ -68,9 +61,9 @@ namespace Tests
                 .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
             //Arrange
             var book = new XMindConfiguration()
-                 .WriteTo
-                 .Writer(writer)
-                 .CreateWorkBook(workbookName: "test");
+                .WriteTo
+                .Writer(writer)
+                .CreateWorkBook(workbookName: "test");
             //Act
             book.Save();
             //Assert
@@ -81,7 +74,7 @@ namespace Tests
 
         [Test]
 
-        public void CreateWorkBook_ReadZippedXMindBookFromFileSystem_Success()
+        public async Task CreateWorkBook_ReadZippedXMindBookFromFileSystem_Success()
         {
 
             //Arrange
@@ -89,15 +82,16 @@ namespace Tests
                 .WithFileWriter(basePath: _customOutputFolderName, zip: true)
                 .CreateWorkBook(workbookName: "test.xmind");
 
-            var writer = (InMemoryWriter) new InMemoryWriter()
-                .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
-            book.Save();
+            await book.Save();
+
+            var writer = new InMemoryWriter()
+                .SetOutput(new InMemoryWriterOutputConfig(outputName: "root")) as InMemoryWriter;
             var book2 = new XMindConfiguration()
-                 .WriteTo
-                 .Writer(writer)
-                 .LoadWorkBookFromLocation(Path.Combine(_customOutputFolderName, "test.xmind"));
+                .WriteTo
+                .Writer(writer)
+                .LoadWorkBookFromLocation(Path.Combine(_customOutputFolderName, "test.xmind"));
             //Act
-            book2.Save();
+            await book2.Save();
             //Assert
             writer.DocumentStorage.Keys.Should().NotBeEmpty().And
                 .HaveCount(3).And

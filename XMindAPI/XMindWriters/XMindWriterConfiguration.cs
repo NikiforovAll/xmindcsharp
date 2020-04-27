@@ -14,23 +14,23 @@ namespace XMindAPI.Writers.Configuration
         internal Action<List<XMindWriterContext>, XMindWorkBook> FinalizeAction { get; private set; }
         private readonly XMindConfiguration _xMindConfiguration;
 
-        // internal IXMindWriter MainWriter { get => _writer; set => _writer = value; }
-        private List<IXMindWriter> _writers;
+        // internal IXMindWriter<IXMindWriterOutputConfig> MainWriter { get => _writer; set => _writer = value; }
+        private List<IXMindWriter<IXMindWriterOutputConfig>> _writers;
 
-        private List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>> _criteria;
+        private List<Func<XMindWriterContext, List<IXMindWriter<IXMindWriterOutputConfig>>, IXMindWriter<IXMindWriterOutputConfig>>> _criteria;
 
         public XMindWriterConfiguration(XMindConfiguration xMindConfiguration)
         {
             this._xMindConfiguration = xMindConfiguration;
         }
 
-        public XMindConfiguration Writer(IXMindWriter writer)
+        public XMindConfiguration Writer(IXMindWriter<IXMindWriterOutputConfig> writer)
         {
-            _writers = new List<IXMindWriter>{writer};
+            _writers = new List<IXMindWriter<IXMindWriterOutputConfig>>{writer};
             return _xMindConfiguration;
         }
 
-        public XMindConfiguration Writers(List<IXMindWriter> writers)
+        public XMindConfiguration Writers(List<IXMindWriter<IXMindWriterOutputConfig>> writers)
         {
             _writers = writers;
             // foreach (var writer in writers)
@@ -40,7 +40,7 @@ namespace XMindAPI.Writers.Configuration
             return _xMindConfiguration;
         }
 
-        public XMindConfiguration SetWriterBinding(List<Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter>> criteria)
+        public XMindConfiguration SetWriterBinding(List<Func<XMindWriterContext, List<IXMindWriter<IXMindWriterOutputConfig>>, IXMindWriter<IXMindWriterOutputConfig>>> criteria)
         {
             _criteria = criteria;
             return _xMindConfiguration;
@@ -52,7 +52,7 @@ namespace XMindAPI.Writers.Configuration
             return _xMindConfiguration;
         }
 
-        internal List<IXMindWriter> ResolveWriters(XMindWriterContext context)
+        internal List<IXMindWriter<IXMindWriterOutputConfig>> ResolveWriters(XMindWriterContext context)
         {
             if(_writers == null || !_writers.Any())
             {
@@ -67,7 +67,7 @@ namespace XMindAPI.Writers.Configuration
             return writersFound.ToList();
         }
 
-        internal void AddResolver(Func<XMindWriterContext, List<IXMindWriter>, IXMindWriter> criteria)
+        internal void AddResolver(Func<XMindWriterContext, List<IXMindWriter<IXMindWriterOutputConfig>>, IXMindWriter<IXMindWriterOutputConfig>> criteria)
         {
             _criteria.Add(criteria);
         }

@@ -2,38 +2,36 @@ using System.IO;
 using System.Xml.Linq;
 using XMindAPI;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace XMindAPI.Writers
 {
-    public class InMemoryWriter : IXMindWriter
+    public class InMemoryWriter : IXMindWriter<IXMindWriterOutputConfig>
     {
-        private readonly Dictionary<string, XDocument> _documentStorage = new Dictionary<string, XDocument>();
-
         private IXMindWriterOutputConfig _output;
 
-        public Dictionary<string, XDocument> DocumentStorage { get => _documentStorage;}
+        public Dictionary<string, XDocument> DocumentStorage { get; } = new Dictionary<string, XDocument>();
 
         public InMemoryWriter() : this(new FileWriterOutputConfig("root"))
         {
         }
-        public InMemoryWriter(IXMindWriterOutputConfig output)
-        {
-            SetOutput(output);
-        }
-        public IXMindWriter SetOutput(IXMindWriterOutputConfig output)
-        {
-            _output = output;
-            return this;
-        }
+        public InMemoryWriter(IXMindWriterOutputConfig output) => _output = output;
 
-        public void WriteToStorage(XDocument document, string file)
+        public Task WriteToStorage(XDocument document, string file)
         {
             DocumentStorage.Add(file, document);
+            return Task.CompletedTask;
         }
 
         public IXMindWriterOutputConfig GetOutputConfig()
         {
             return _output;
+        }
+
+        public IXMindWriter<IXMindWriterOutputConfig> SetOutput(IXMindWriterOutputConfig output)
+        {
+            _output = output;
+            return this;
         }
     }
 }

@@ -43,9 +43,10 @@ namespace XMindAPI.Writers
 
         public IXMindWriterOutputConfig SetBasePath(string path)
         {
-            if (this._useDefaultPath)
+            if (_useDefaultPath)
             {
-                throw new InvalidOperationException("Not possible to assign new path, default path in use because of FileWriterOutputConfig.useDefaultPath");
+                throw new InvalidOperationException(
+                    "Not possible to assign new path, default path in use because of FileWriterOutputConfig.useDefaultPath");
             }
             Path = path;
             return this;

@@ -26,6 +26,11 @@ namespace XMindAPI.Configuration
             WriteTo = new XMindWriterConfiguration(this);
         }
 
+        /// <summary>
+        /// Loads workbook from location. WARNING: currently, book is not de-serialized in XML correctly.
+        /// </summary>
+        /// <param name="sourceFileLocation">Path to <i>.xmind</i> file</param>
+        /// <returns></returns>
         public XMindWorkBook LoadWorkBookFromLocation(string sourceFileLocation)
         {
             // WorkbookName = workbookName;
@@ -39,6 +44,11 @@ namespace XMindAPI.Configuration
             return workbook;
         }
 
+        /// <summary>
+        /// Creates new workbook, standard XML assets are generated in-memory.
+        /// </summary>
+        /// <param name="workbookName">The name of <c>XMindWorkBook</c></param>
+        /// <returns></returns>
         public XMindWorkBook CreateWorkBook(string workbookName) =>
             new XMindWorkBook(workbookName, this, new XMindDocumentBuilder());
     }

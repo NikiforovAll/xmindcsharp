@@ -1,19 +1,19 @@
-﻿//TODO: cyclic dependency with XMindAPI.Configuration and XMindAPI.Writers.Configuraiton;
+﻿//TODO: cyclic dependency with XMindAPI.Configuration and XMindAPI.Writers.Configuration;
+
+using Ardalis.GuardClauses;
+using Microsoft.Extensions.Configuration;
 using System;
-
 using System.Collections.Generic;
-
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
-
 using XMindAPI.Configuration;
-using XMindAPI.Writers;
 using XMindAPI.Core;
 using XMindAPI.Core.Builders;
 using XMindAPI.Core.DOM;
+using XMindAPI.Writers;
+
 using static XMindAPI.Core.DOM.DOMConstants;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace XMindAPI.Models
 {
@@ -22,7 +22,12 @@ namespace XMindAPI.Models
     /// </summary>
     public class XMindWorkBook : AbstractWorkbook, INodeAdaptableFactory//IWorkbook
     {
-        public string Name { get; set; }
+        public XMindWorkBook(string name)
+        {
+            this.Name = name;
+
+        }
+                public string Name { get; set; }
         private readonly XMindConfiguration _bookConfiguration;
         private readonly IXMindDocumentBuilder _documentBuilder;
 
@@ -34,14 +39,16 @@ namespace XMindAPI.Models
         // private string _fileName = null;
 
         /// <summary>
-        /// Creates a new XMind workbook if loadContent is false, otherwise the file content will be loaded.
+        /// Creates a new <see cref="XMindWorkBook"/> if loadContent is false, otherwise the file content will be loaded.
         /// </summary>
         // /// <param name="loadContent">If true, the current data from the file will be loaded, otherwise an empty workbook will be created.</param>
         internal XMindWorkBook(string name, XMindConfiguration bookConfiguration, IXMindDocumentBuilder builder)
         {
+            Guard.Against.Null(XMindConfigurationLoader.Configuration.XMindConfigCollection, "XMindConfigCollection");
+
             Name = name;
             _xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
-            this._bookConfiguration = bookConfiguration;
+            _bookConfiguration = bookConfiguration;
             _documentBuilder = builder;
 
             _documentBuilder.CreateMetaFile();
@@ -110,7 +117,7 @@ namespace XMindAPI.Models
                 [manifestFileName] = _documentBuilder.ManifestFile,
                 [contentFileName] = _documentBuilder.ContentFile
             };
-
+            var writerJobs = new List<Task>(3);
             var writerContexts = new List<XMindWriterContext>();
             foreach (var kvp in files)
             {
@@ -126,14 +133,23 @@ namespace XMindAPI.Models
                 {
                     throw new InvalidOperationException("XMindBook.Save: Writer is not selected");
                 }
-
                 foreach (var writer in selectedWriters)
                 {
-                    writer.WriteToStorage(kvp.Value, kvp.Key);
+                    writerJobs.Add(writer.WriteToStorage(kvp.Value, kvp.Key));
                 }
                 writerContexts.Add(currentWriterContext);
             }
-            _bookConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts, this);
+            try
+            {
+                // TODO: add exception handling
+                await Task.WhenAll(writerJobs);
+                _bookConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts, this);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public override IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2)

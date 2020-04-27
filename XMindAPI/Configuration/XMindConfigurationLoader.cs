@@ -69,14 +69,6 @@ namespace XMindAPI.Configuration
                 if (File.Exists(settingsPath))
                 {
                     builder.SetBasePath(assemblyPathRoot)
-                        // .AddInMemoryCollection(
-                        //     new Dictionary<string, string>
-                        //     {
-                        //         [ManifestLabel] = "output:definition:manifest",
-                        //         [MetaLabel] = "output:definition:meta",
-                        //         [ContentLabel] = "output:definition:content"
-                        //     }
-                        // )
                         .AddJsonFile(path: settingsFileName, optional: true, reloadOnChange: true);
                 }
                 XMindConfigCollection = builder.Build();
