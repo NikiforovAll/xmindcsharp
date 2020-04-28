@@ -11,6 +11,8 @@ using XMindAPI.Configuration;
 using XMindAPI.Core;
 using XMindAPI.Core.Builders;
 using XMindAPI.Core.DOM;
+using XMindAPI.Infrastructure;
+using XMindAPI.Infrastructure.Logging;
 using XMindAPI.Writers;
 
 using static XMindAPI.Core.DOM.DOMConstants;
@@ -27,7 +29,7 @@ namespace XMindAPI.Models
             this.Name = name;
 
         }
-                public string Name { get; set; }
+        public string Name { get; set; }
         private readonly XMindConfiguration _bookConfiguration;
         private readonly IXMindDocumentBuilder _documentBuilder;
 
@@ -107,6 +109,8 @@ namespace XMindAPI.Models
         /// </summary>
         public override async Task Save()
         {
+            var requestId = $"SaveWorkBook-{SmallGuidGenerator.NewGuid()}";
+            Logger.Log.RequestStart(requestId);
             var manifestFileName = _xMindSettings[XMindConfiguration.ManifestLabel];
             var metaFileName = _xMindSettings[XMindConfiguration.MetaLabel];
             var contentFileName = _xMindSettings[XMindConfiguration.ContentLabel];
@@ -131,7 +135,9 @@ namespace XMindAPI.Models
                     .ResolveWriters(currentWriterContext);
                 if (selectedWriters == null)
                 {
-                    throw new InvalidOperationException("XMindBook.Save: Writer is not selected");
+                    var errorMessage = "XMindBook.Save: Writer is not selected";
+                    Logger.Log.Error(errorMessage);
+                    throw new InvalidOperationException(errorMessage);
                 }
                 foreach (var writer in selectedWriters)
                 {
@@ -141,14 +147,19 @@ namespace XMindAPI.Models
             }
             try
             {
-                // TODO: add exception handling
                 await Task.WhenAll(writerJobs);
+                Logger.Log.RequestPhase(requestId, "WritersCompleted");
                 _bookConfiguration.WriteTo.FinalizeAction?.Invoke(writerContexts, this);
+                Logger.Log.RequestPhase(requestId, "FinalizerExecuted");
             }
             catch (Exception)
             {
-
+                // TODO: add exception handling
                 throw;
+            }
+            finally
+            {
+                Logger.Log.RequestStop(requestId);
             }
         }
 

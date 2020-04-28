@@ -33,7 +33,7 @@ namespace Tests
         }
 
         [Test]
-        public void Save_CreateEmptyBookWithFileWriterInCaseOfCustomBasePath_Success()
+        public async Task Save_CreateEmptyBookWithFileWriterInCaseOfCustomBasePath_Success()
         {
 
             var book = new XMindConfiguration()
@@ -50,7 +50,7 @@ namespace Tests
                 .WriteTo.SetWriterBinding(FileWriterFactory.CreateStandardResolvers())
                 .CreateWorkBook(workbookName: "test");
             //Act
-            book.Save();
+            await book.Save();
             //Assert
             DirectoryInfo di = new DirectoryInfo(_customOutputFolderName);
             di.GetFileSystemInfos("*.xml")
@@ -60,16 +60,18 @@ namespace Tests
         }
 
         [Test]
-        public void Save_CreateEmptyBookWithFileWriterWithDefaultPath_Success()
+        public async Task Save_CreateEmptyBookWithFileWriterWithDefaultPath_Success()
         {
             //Arrange
+            var outpath = Path.Combine(_customOutputFolderName,
+                Path.GetRandomFileName());
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(basePath: outpath, zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Act
-            book.Save();
+            await book.Save();
             //Assert
-            DirectoryInfo di = new DirectoryInfo(_xmindOutputFolderName);
+            DirectoryInfo di = new DirectoryInfo(outpath);
             di.GetFileSystemInfos("*.xml")
                 .Select(fi => fi.Should().BeOfType<FileInfo>().Which.Name
                 .Should().BeOneOf(_files))
@@ -79,13 +81,15 @@ namespace Tests
         public async Task Save_CreateEmptyBookWithFileWriterWithDefaultPathAndZip_Success()
         {
             //Arrange
+            var outpath = Path.Combine(_customOutputFolderName,
+                Path.GetRandomFileName());
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: true)
+                .WithFileWriter(basePath: outpath, zip: true)
                 .CreateWorkBook(workbookName: "test.xmind");
             //Act
             await book.Save();
             //Assert
-            DirectoryInfo di = new DirectoryInfo(_xmindOutputFolderName);
+            DirectoryInfo di = new DirectoryInfo(outpath);
             di.GetFileSystemInfos("*.xmind").Should().ContainSingle();
         }
 

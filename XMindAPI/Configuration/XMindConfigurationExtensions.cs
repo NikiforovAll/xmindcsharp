@@ -11,6 +11,7 @@ namespace XMindAPI.Extensions
 {
     public static class XMindConfigurationExtensions
     {
+        // TODO: add API to write to stream, minor because it is always possible to implement IXMindWriter
         public static XMindConfiguration WithFileWriter(
             this XMindConfiguration config,
             string? basePath = default,
