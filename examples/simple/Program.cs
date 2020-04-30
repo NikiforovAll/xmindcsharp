@@ -80,6 +80,7 @@ namespace simple
             newTopic.IsFolded = true;
             newTopic.HyperLink ="http://google.com";
             newTopic.AddMarker("priority-1");
+            newTopic.AddMarker("task-half");
             var foldedTopic = book.CreateTopic("Folded");
             newTopic.Add(foldedTopic);
             newTopic.Add(foldedTopic);
