@@ -19,16 +19,10 @@ namespace XMindAPI.Infrastructure.Logging
         public void DebugTrace(string Message) { WriteEvent(4, Message); }
 
         [Event(5, Keywords = Keywords.Error, Message = "ErrorMessage: {0}", Channel = EventChannel.Debug, Level = EventLevel.Error)]
-        public void Error(string Message, Exception? e = null)
+        public void Error(string Message)
         {
-            if (e is null)
-            {
-                WriteEvent(5, Message);
-            }
-            else
-            {
-                WriteEvent(5, Message, e);
-            }
+            // TODO: add exception in SourceEvent
+            WriteEvent(5, Message);
         }
 
         [Event(6, Keywords = Keywords.Error, Message = "ErrorMessage: {0}", Channel = EventChannel.Debug, Level = EventLevel.Warning)]

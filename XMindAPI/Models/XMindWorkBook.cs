@@ -23,6 +23,9 @@ namespace XMindAPI.Models
     /// </summary>
     public class XMindWorkBook : AbstractWorkbook, INodeAdaptableFactory//IWorkbook
     {
+        // https://github.com/xmindltd/xmind/wiki/UsingXmindAPI
+        // TODO: add IO
+        // void save(OutputStream output);  // save the workbook to the specified OutputStream
         public string Name { get; set; }
         private readonly XMindConfiguration _bookConfiguration;
         private readonly IXMindDocumentBuilder _documentBuilder;
@@ -149,7 +152,7 @@ namespace XMindAPI.Models
             }
             catch (Exception e)
             {
-                Logger.Log.Error(e.Message, e);
+                Logger.Log.Error(e.Message);
                 throw;
             }
             finally
@@ -222,12 +225,12 @@ namespace XMindAPI.Models
         /// <returns>Registered XMindTopic</returns>
         public override ITopic CreateTopic()
         {
-            Logger.Log.DebugTrace($"Register topic for {Name}");
             var topicElement = new XElement(TAG_TOPIC);
             XMindTopic topic = new XMindTopic(topicElement, this)
             {
                 OwnedSheet = GetPrimarySheet()
             };
+            Logger.Log.DebugTrace($"Register topic {topic.GetId()} for {Name}");
             _adaptableRegistry.RegisterByNode(topic, topic.Implementation);
             return topic;
         }

@@ -1,18 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xmap-content xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" version="2.0" xmlns="urn:xmind:xmap:xmlns:content:2.0">
-  <sheet id="9dec7f5e25d9408fb385ad88259f56e1" xmlns="">
-    <topic id="c8311472daa7476e9ac061d1badfc991">
+  <sheet id="e7c5eb24575a4f64b1e9dd40bf3916e9" xmlns="">
+    <topic id="2318762798ce422a8c97ca730d4cb07b">
       <title>RootTopic</title>
       <children>
         <topics type="attached">
-          <topic id="bca40b6281d947c7bf1a794c9ccd6028">
-            <title>ChildTopicNew</title>
-          </topic>
-          <topic id="bca40b6281d947c7bf1a794c9ccd6028">
-            <title>ChildTopicNew</title>
-          </topic>
-          <topic id="bca40b6281d947c7bf1a794c9ccd6028">
+          <topic id="537a7a23d07e45f5846d255e38bf1891" branch="folded" href="http://google.com">
             <title>ChildTopic</title>
+            <marker-refs>
+              <marker marker-id="priority-1" />
+            </marker-refs>
+            <children>
+              <topics type="attached">
+                <topic id="8db9ad8b8b1f4a468450a2124a80e4be">
+                  <title>Folded</title>
+                </topic>
+                <topic id="8db9ad8b8b1f4a468450a2124a80e4be">
+                  <title>Folded</title>
+                </topic>
+              </topics>
+            </children>
           </topic>
         </topics>
       </children>

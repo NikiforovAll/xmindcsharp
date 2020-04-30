@@ -6,6 +6,8 @@ using XMindAPI.Extensions;
 using XMindAPI.Models;
 using XMindAPI.Writers;
 using System.Xml.XPath;
+using System.Linq;
+using static XMindAPI.Core.DOM.DOMConstants;
 
 namespace Tests
 {
@@ -92,6 +94,76 @@ namespace Tests
             //Assert
             root.Implementation.XPathSelectElement("(/children/topics[@type='detached']/topic)[1]")
                 .Should().HaveAttribute("id", detachedTopic.GetId());
+        }
+
+        [Test]
+        public void AddLabels_MultipleLabels_Success()
+        {
+            //Arrange
+            var root = WorkBook.CreateTopic("Topic") as XMindTopic;
+            const string label = "test-label";
+            root.AddLabel(label);
+            root.Implementation.Should().HaveElement("labels")
+                .Which.Descendants().Should().ContainSingle();
+            root.Implementation.XPathSelectElement("/labels[1]")
+                .Should().HaveValue(label, "because label was created with some text");
+        }
+
+        [Test]
+        public void RemoveLabel_RemoveLastLabel_Success()
+        {
+            //Arrange
+            var root = WorkBook.CreateTopic("Topic") as XMindTopic;
+            const string label = "test-label";
+            //Act
+            root.AddLabel(label);
+            root.RemoveLabel(label);
+            //Assert
+            root.Implementation.Should().HaveElement("labels")
+                .Which.Descendants().Should().BeEmpty();
+        }
+
+        [Test]
+        public void SetLabels_NotEmptyCollection_Success()
+        {
+            //Arrange
+            var labelsCollection = new string[] { "l1", "l2" };
+            var root = WorkBook.CreateTopic("Topic") as XMindTopic;
+            //Act
+            root.SetLabels(labelsCollection);
+            //Assert
+            root.Implementation.Should().HaveElement("labels")
+                .Which.Descendants().Select(elem => elem.Value)
+                .Should().BeEquivalentTo(labelsCollection, "because exact collection of labels was set");
+            root.GetLabels().Count.Should().Be(2, "because two labels added");
+        }
+
+        [Test]
+        public void AddMarker_SingleMarker_Success()
+        {
+            //Arrange
+            var root = WorkBook.CreateTopic("Topic") as XMindTopic;
+            //Act
+            root.AddMarker(MAR_priority1);
+            //Assert
+            root.Implementation.Should().HaveElement(TAG_MARKER_REFS)
+                .Which.Should().HaveElement(TAG_MARKER_REF)
+                .Which.Should().HaveAttribute(ATTR_MARKER_ID, MAR_priority1);
+        }
+
+        [Test]
+        public void RemoveMarker_EmptyMarkersAsResult_Success()
+        {
+            //Arrange
+            var root = WorkBook.CreateTopic("Topic") as XMindTopic;
+            //Act
+            root.AddMarker(MAR_priority1);
+            root.RemoveMarker(MAR_priority1);
+            //Assert
+            root.Implementation.Should().HaveElement(TAG_MARKER_REFS)
+                .Which.Descendants().Select(elem => elem.Value)
+                .Should().BeEmpty();
+            root.HasMarker(MAR_priority1).Should().BeFalse();
         }
 
         [OneTimeTearDown]

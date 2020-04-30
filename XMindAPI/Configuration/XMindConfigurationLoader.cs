@@ -73,11 +73,11 @@ namespace XMindAPI.Configuration
                 }
                 XMindConfigCollection = builder.Build();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 const string errorMessage = "Failed to load configuration file";
-                Logger.Log.Error(errorMessage, e);
-                throw new InvalidOperationException(errorMessage, e);
+                Logger.Log.Error(errorMessage);
+                throw new InvalidOperationException(errorMessage);
             }
             return this;
         }

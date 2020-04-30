@@ -6,50 +6,30 @@ XMind API that allows to build .xmind files programmatically
 
 ### Installing
 
-```
+```bash
 dotnet add package XMindCsharp
 ```
 
 ## Running the tests
 
 Run following command from the root folder:
+
 ```bash
 dotnet test ./XMindAPI.Tests/
 ```
 
-## Features
+## Scope
 
-### Book
+## Info
 
-* Initialize book
-* Create Sheet
-* Add Sheet
-* Get Sheets
-* Get Primary Sheet
-* Remove Sheet
-* Find Topic
-* Sheet indexing
-
-### Sheet
-
-TODO:
-
-* Make sure that book loading and manipulation is correct
-* Relationship support
-* Investigate what happens when elements are deleted, probably need to update registry via event dispatching
-
-## TODO
-
-* TODOs in code base
-* Make sure that XMindBook is read correctly from disk, e.g. all adaptables are created and registry is ready for usage.
-
-### XMindWorkbook
+* <https://github.com/xmindltd/xmind/wiki/XMindFileFormat>
+* <https://github.com/xmindltd/xmind/wiki/UsingXmindAPI>
 
 ## Contributing
 
 ### Git Commit Guidelines
 
-```
+```text
 <type>[optional scope]: <description>
 
 [optional body]

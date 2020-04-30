@@ -39,7 +39,7 @@ namespace XMindAPI.Models
 
         public XMindSheet(XElement implementation, XMindWorkBook book)
         {
-            OwnedWorkbook = book;
+            _ownedWorkbook = book;
             Implementation = DOMUtils.AddIdAttribute(implementation);
             // implementation.Attributes().Where(x => x.IsNamespaceDeclaration).Remove();
             //creates default topic if needed
@@ -71,7 +71,8 @@ namespace XMindAPI.Models
         public ITopic GetRootTopic()
         {
             XElement rootTopic = DOMUtils.GetFirstElementByTagName(Implementation, TAG_TOPIC);
-            return (ITopic)(OwnedWorkbook as XMindWorkBook).GetAdaptableRegistry().GetAdaptable(rootTopic);
+            return (ITopic)(OwnedWorkbook as XMindWorkBook)
+                ?.GetAdaptableRegistry()?.GetAdaptable(rootTopic)!;
         }
 
         public bool HasTitle()
@@ -86,9 +87,9 @@ namespace XMindAPI.Models
 
         public void ReplaceRootTopic(ITopic newRootTopic)
         {
-            XElement rootTopic = (GetRootTopic() as XMindTopic).Implementation;
-            rootTopic.AddAfterSelf((newRootTopic as XMindTopic).Implementation);
-            rootTopic.Remove();
+            XElement? rootTopic = (GetRootTopic() as XMindTopic)?.Implementation;
+            rootTopic?.AddAfterSelf((newRootTopic as XMindTopic)?.Implementation);
+            rootTopic?.Remove();
         }
 
         public override string ToString()
@@ -98,12 +99,12 @@ namespace XMindAPI.Models
 
         public IWorkbook GetParent()
         {
-            XNode node = this.Implementation.Parent;
-            if (node == (OwnedWorkbook as XMindWorkBook).GetWorkbookElement())
+            XNode node = Implementation.Parent;
+            if (node != ((OwnedWorkbook as XMindWorkBook)?.GetWorkbookElement()))
             {
-                return OwnedWorkbook;
+                throw new InvalidOperationException("GetParent: Parent WorkBook is not set");
             }
-            return null;
+            return OwnedWorkbook;
         }
 
         public int GetIndex()
@@ -113,7 +114,7 @@ namespace XMindAPI.Models
 
         public override int GetHashCode()
         {
-            return this.Implementation.GetHashCode();
+            return Implementation.GetHashCode();
         }
     }
 

@@ -18,7 +18,7 @@ namespace XMindAPI.Core
         /// </summary>
         void ReplaceRootTopic(ITopic newRootTopic);
 
-        
+
         HashSet<IRelationship> GetRelationships();
         void AddRelationship(IRelationship relationship);
 
