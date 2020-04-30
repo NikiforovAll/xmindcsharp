@@ -14,7 +14,7 @@ dotnet_csproj:
   file: XMindAPI\XMindAPI.csproj
 
 before_build:
- - nuget restore
+  - nuget restore
 
 build:
   publish_nuget: true
@@ -27,3 +27,12 @@ deploy:
     skip_symbols: false
     on:
       branch: master
+  - provider: NuGet
+    server: https://nuget.pkg.github.com/NikiforovAll/index.json
+    skip_symbols: true
+    symbol_server:
+    artifact: /.nupkg/
+    username: NikiforovAll
+    api_key:
+      secure: jXimydKwuBAN67ZfrEbLcYfbfnCu/S5Sbxj43fUoi3OXSjFzhQuibFlDNwowN0WY
+
