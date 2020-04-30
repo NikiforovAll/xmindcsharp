@@ -11,7 +11,7 @@ namespace XMindAPI.Core.DOM
 
         internal static XElement AddIdAttribute(XElement element)
         {
-            if(!element.Attributes().Any())
+            if (!element.Attributes().Any())
             {
                 element.SetAttributeValue(ATTR_ID, Core.GetFactory().CreateId());
                 //TODO: setIdAttribute(tag, true) - investigate
@@ -24,7 +24,7 @@ namespace XMindAPI.Core.DOM
             var result = document.Descendants()
                 .Where(el => el.Attributes("id").FirstOrDefault()?.Equals(id) ?? false)
                 .FirstOrDefault();
-            if(result == null)
+            if (result == null)
             {
                 result = document.Descendants().FirstOrDefault(el => GetElementById(el, id) != null);
             }
@@ -43,15 +43,15 @@ namespace XMindAPI.Core.DOM
         }
 
 
-        internal static List<T> GetChildList<T>(XElement element, string  childTag, NodeAdaptableRegistry registry) where T : IAdaptable
+        internal static List<T> GetChildList<T>(XElement element, string childTag, NodeAdaptableRegistry registry) where T : IAdaptable
         {
             List<T> result = new List<T>();
             foreach (var item in GetChildElementsByTag(element, childTag))
             {
                 IAdaptable adaptable = registry.GetAdaptable(item);
-                if(adaptable != null)
+                if (adaptable != null)
                 {
-                    result.Add((T) adaptable);
+                    result.Add((T)adaptable);
                 }
             }
             return result;
@@ -76,18 +76,22 @@ namespace XMindAPI.Core.DOM
         internal static void SetText(XNode node, string tagName, string textContent)
         {
             XNode textNode = GetFirstElementByTagName(node, tagName);
-            if(textNode != null)
+            if (textNode != null)
             {
-                if(textContent == null)
+                if (textContent == null)
                 {
                     textNode.Remove();
-                }else{
-                    var element =  (XElement) textNode;
+                }
+                else
+                {
+                    var element = (XElement)textNode;
                     element.Value = textContent;
                 }
-            }else {
+            }
+            else
+            {
                 //TODO: strange behavior - investigate
-                var element = (XElement) node;
+                var element = (XElement)node;
                 element.Add(new XElement(tagName, textContent));
             }
         }
@@ -115,10 +119,10 @@ namespace XMindAPI.Core.DOM
             return innerElement;
         }
 
-        internal static XElement EnsureChildElement(XNode parent, String tagName)
+        internal static XElement EnsureChildElement(XNode parent, string tagName)
         {
             XElement element;
-            if(parent.NodeType == System.Xml.XmlNodeType.Document)
+            if (parent.NodeType == System.Xml.XmlNodeType.Document)
             {
                 element = parent.Parent;
             }
@@ -126,7 +130,7 @@ namespace XMindAPI.Core.DOM
             {
                 element = GetFirstElementByTagName(parent, tagName);
             }
-            if(element == null)
+            if (element == null)
             {
                 // Logger.Info($"EnsureChildElement.CreateElement: item {tagName}was created for {parent.NodeType}");
                 CreateElement(parent, tagName);

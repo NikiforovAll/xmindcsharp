@@ -55,7 +55,7 @@ namespace Tests
         // }
 
         [Test]
-        public void Save_CreateEmptyBookWithInMemoryWriter_Success()
+        public async Task Save_CreateEmptyBookWithInMemoryWriter_Success()
         {
             var writer = (InMemoryWriter)new InMemoryWriter()
                 .SetOutput(new InMemoryWriterOutputConfig(outputName: "root"));
@@ -65,7 +65,7 @@ namespace Tests
                 .Writer(writer)
                 .CreateWorkBook(workbookName: "test");
             //Act
-            book.Save();
+            await book.Save();
             //Assert
             writer.DocumentStorage.Keys.Should().NotBeEmpty().And
                 .HaveCount(3).And
@@ -140,7 +140,7 @@ namespace Tests
             //Act
             book.AddSheet(sheet, 0);
             //Assert
-            book.GetPrimarySheet().Should().Be(sheet, "The last book must become primary");
+            book.GetPrimarySheet().Should().Be(sheet, "The last sheet must become primary");
         }
 
         [Test]

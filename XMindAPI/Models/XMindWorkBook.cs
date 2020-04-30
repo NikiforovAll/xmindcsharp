@@ -27,7 +27,6 @@ namespace XMindAPI.Models
         public XMindWorkBook(string name)
         {
             this.Name = name;
-
         }
         public string Name { get; set; }
         private readonly XMindConfiguration _bookConfiguration;
@@ -163,38 +162,49 @@ namespace XMindAPI.Models
             }
         }
 
-        public override IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2)
+        public override IRelationship CreateRelationship(
+            IRelationshipEnd rel1, IRelationshipEnd rel2)
         {
-            throw new NotImplementedException();
+            ISheet sheet = rel1.OwnedSheet;
+            IRelationship rel = CreateRelationship();
+            rel.End1 = rel1;
+            rel.End2 = rel2;
+            sheet.AddRelationship(rel);
+            return rel;
         }
 
         public override IRelationship CreateRelationship()
         {
-            throw new NotImplementedException();
+            var relationshipElement = new XElement(TAG_RELATIONSHIP);
+            var relationship = new XMindRelationship(relationshipElement, this);
+            _adaptableRegistry.RegisterByNode(relationship, relationship.Implementation);
+            return relationship;
         }
 
         public override ISheet CreateSheet()
         {
             var sheetElement = new XElement(TAG_SHEET);
+            var sheet = new XMindSheet(sheetElement, this);
             // GetWorkbookElement().Add(sheetElement);
-            XMindSheet sheet = new XMindSheet(sheetElement, this);
             _adaptableRegistry.RegisterByNode(sheet, sheet.Implementation);
             return sheet;
         }
 
         public override void AddSheet(ISheet sheet, int index)
         {
-            XElement elementImplementation = (sheet as XMindSheet)?.Implementation;
-            var bookImplementation = GetWorkbookElement();
-            if (elementImplementation == null)
+            if (!(sheet is XMindSheet impl) || impl.Implementation is null)
             {
-                // Logger.Warn("XMindWorkbook.AddSheet: sheet is not correct");
+                Logger.Log.Error("XMindWorkbook.AddSheet: sheet is not correct");
                 return;
             }
-            // if (elementImplementation.Parent != bookImplementation)
-            // {
-            //     Logger.Warn("XMindWorkbook.AddSheet: sheet must belong to same document");
-            // }
+            XElement elementImplementation = impl.Implementation;
+            var bookImplementation = GetWorkbookElement();
+            if (elementImplementation.Parent is object
+                && elementImplementation.Parent != bookImplementation)
+            {
+                Logger.Log.Error("XMindWorkbook.AddSheet: sheet must belong to same document");
+                return;
+            }
             var childElements = DOMUtils.GetChildElementsByTag(bookImplementation, TAG_SHEET);
             if (index >= 0 && index < childElements.Count())
             {
@@ -208,12 +218,29 @@ namespace XMindAPI.Models
             }
         }
 
+        /// <summary>
+        /// Register topic. Note <see cref="ITopic"/> is not included in DOM of <see cref="XMindWorkBook"/>
+        /// </summary>
+        /// <returns>Registered XMindTopic</returns>
         public override ITopic CreateTopic()
         {
             var topicElement = new XElement(TAG_TOPIC);
-            // GetWorkbookElement().Add(topicElement);
-            XMindTopic topic = new XMindTopic(topicElement, this);
+            XMindTopic topic = new XMindTopic(topicElement, this)
+            {
+                OwnedSheet = GetPrimarySheet()
+            };
             _adaptableRegistry.RegisterByNode(topic, topic.Implementation);
+            return topic;
+        }
+        /// <summary>
+        /// Register topic. Note <see cref="ITopic"/> is not included in DOM of <see cref="XMindWorkBook"/>
+
+        /// <param name="title">Title to set</param>
+        /// <returns>Registered XMindTopic</returns>
+        public ITopic CreateTopic(string title)
+        {
+            var topic = CreateTopic();
+            topic.SetTitle(title);
             return topic;
         }
 
@@ -222,7 +249,7 @@ namespace XMindAPI.Models
             XNode node = source.GetAdapter<XNode>(typeof(XNode));
             if (node == null)
             {
-                node = this.GetWorkbookElement();
+                node = GetWorkbookElement();
             }
             return GetAdaptableRegistry()
                 .GetAdaptable(id, node.Document);
@@ -301,7 +328,7 @@ namespace XMindAPI.Models
 
         internal XElement GetWorkbookElement()
         {
-            return this._implementation;
+            return _implementation;
         }
     }
 }

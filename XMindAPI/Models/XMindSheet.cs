@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using XMindAPI.Core;
 using XMindAPI.Core.DOM;
+using XMindAPI.Infrastructure.Logging;
 using static XMindAPI.Core.DOM.DOMConstants;
 
 
@@ -11,36 +12,35 @@ namespace XMindAPI.Models
 {
     public class XMindSheet : ISheet
     {
-        private readonly XElement implementation;
         private XMindWorkBook _ownedWorkbook;
 
         public string GetId()
         {
-            return implementation.Attribute(ATTR_ID).Value;
+            return Implementation.Attribute(ATTR_ID).Value;
         }
 
         public string GetTitle()
         {
-            return DOMUtils.GetTextContentByTag(implementation, TAG_TITLE);
+            return DOMUtils.GetTextContentByTag(Implementation, TAG_TITLE);
         }
 
         public void SetTitle(string value)
         {
-            DOMUtils.SetText(implementation, TAG_TITLE, value);
+            DOMUtils.SetText(Implementation, TAG_TITLE, value);
         }
 
-        public IWorkbook OwnedWorkbook 
-        { 
+        public IWorkbook OwnedWorkbook
+        {
             get => _ownedWorkbook;
-            set => _ownedWorkbook = (XMindWorkBook)value; 
+            set => _ownedWorkbook = (XMindWorkBook)value;
         }
 
-        public XElement Implementation => implementation;
+        public XElement Implementation { get; }
 
         public XMindSheet(XElement implementation, XMindWorkBook book)
         {
-            this.OwnedWorkbook = book;
-            this.implementation = DOMUtils.AddIdAttribute(implementation);
+            OwnedWorkbook = book;
+            Implementation = DOMUtils.AddIdAttribute(implementation);
             // implementation.Attributes().Where(x => x.IsNamespaceDeclaration).Remove();
             //creates default topic if needed
             DOMUtils.EnsureChildElement(implementation, TAG_TOPIC);
@@ -48,7 +48,14 @@ namespace XMindAPI.Models
         }
         public void AddRelationship(IRelationship relationship)
         {
-            throw new NotImplementedException();
+            var container = DOMUtils.EnsureChildElement(Implementation, TAG_RELATIONSHIPS);
+            if (!(relationship is XMindRelationship rel))
+            {
+                var errorMessage = "AddRelationship: Not valid relationship";
+                Logger.Log.Error(errorMessage);
+                throw new ArgumentException(errorMessage);
+            }
+            container.Add(rel);
         }
 
         public T GetAdapter<T>(Type adapter)
@@ -64,12 +71,12 @@ namespace XMindAPI.Models
         public ITopic GetRootTopic()
         {
             XElement rootTopic = DOMUtils.GetFirstElementByTagName(Implementation, TAG_TOPIC);
-            return (ITopic) (OwnedWorkbook as XMindWorkBook).GetAdaptableRegistry().GetAdaptable(rootTopic);
+            return (ITopic)(OwnedWorkbook as XMindWorkBook).GetAdaptableRegistry().GetAdaptable(rootTopic);
         }
 
         public bool HasTitle()
         {
-            return !String.IsNullOrEmpty(GetTitle());
+            return !string.IsNullOrEmpty(GetTitle());
         }
 
         public void RemoveRelationship(IRelationship relationship)
@@ -103,7 +110,7 @@ namespace XMindAPI.Models
         {
             return GetParent().GetSheets().ToList().IndexOf(this);
         }
-        
+
         public override int GetHashCode()
         {
             return this.Implementation.GetHashCode();

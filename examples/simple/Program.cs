@@ -7,18 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using System.Diagnostics.Tracing;
 using System.Text;
+using XMindAPI.Core;
 
 namespace simple
 {
     class Program
     {
-        public static ILogger<Program> Logger { get; private set;}
+        public static ILogger<Program> Logger { get; private set; }
 
         public static TextWriter Out { get; set; } = Console.Out;
 
-        static async Task Main(
-            string demo = "memory"
-        )
+        static async Task Main(string demo = "file")
         {
             var serviceProvider = new ServiceCollection()
                 .AddLogging(configure => configure.AddConsole())
@@ -49,12 +48,23 @@ namespace simple
 
         private static async Task SaveWorkBookToFileSystem()
         {
-            string basePath = Path.Combine(Path.GetTempPath(), "xmind-test");
+            // string basePath = Path.Combine(Path.GetTempPath(), "xmind-test");
+            string basePath = Path.Combine("xmind-test");
             var bookName = "test.xmind";
             Logger.LogInformation(default(EventId), $"Base path: ${Path.Combine(basePath, bookName)}");
             var book = new XMindConfiguration()
-                .WithFileWriter(basePath, true)
+                .WithFileWriter(basePath, zip: true)
                 .CreateWorkBook(bookName);
+            var sheet = book.GetPrimarySheet();
+            var rootTopic = sheet.GetRootTopic();
+            rootTopic.SetTitle("RootTopic");
+            var newTopic = book.CreateTopic("ChildTopic");
+            rootTopic.Add(newTopic);
+            rootTopic.Add(newTopic);
+            newTopic.SetTitle("ChildTopicNew");
+            rootTopic.Add(newTopic, index: 0);
+            // IRelationship rel = book.CreateRelationship(rootTopic, newTopic);
+            // sheet.AddRelationship(rel);
             await book.Save();
         }
     }

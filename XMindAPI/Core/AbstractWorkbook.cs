@@ -13,7 +13,7 @@ namespace XMindAPI.Core
 
         public abstract void AddSheet(ISheet sheet, int index);
 
-        public abstract IRelationship CreateRelationship(IRelationship rel1, IRelationship rel2);
+        public abstract IRelationship CreateRelationship(IRelationshipEnd rel1, IRelationshipEnd rel2);
 
         public abstract IRelationship CreateRelationship();
 
