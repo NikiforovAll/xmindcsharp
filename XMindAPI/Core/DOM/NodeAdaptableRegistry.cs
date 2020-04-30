@@ -8,23 +8,23 @@ namespace XMindAPI.Core.DOM
 {
     internal class NodeAdaptableRegistry
     {
-        private XDocument _defaultDocument;
+        private readonly XDocument _defaultDocument;
         private readonly INodeAdaptableFactory _factory;
-        private Dictionary<IDKey, IAdaptable> _idMap = new Dictionary<IDKey, IAdaptable>();
-        private Dictionary<XNode, IAdaptable> _nodeMap = new Dictionary<XNode, IAdaptable>();
+        private readonly Dictionary<IDKey, IAdaptable> _idMap = new Dictionary<IDKey, IAdaptable>();
+        private readonly Dictionary<XNode, IAdaptable> _nodeMap = new Dictionary<XNode, IAdaptable>();
 
-        private IDKey _key = new IDKey();
+        // private IDKey _key = new IDKey();
 
         public NodeAdaptableRegistry(XDocument defaultDocument, INodeAdaptableFactory factory)
         {
-            this._defaultDocument = defaultDocument;
-            this._factory = factory;
+            _defaultDocument = defaultDocument;
+            _factory = factory;
         }
 
-        public IAdaptable GetAdaptableById(String id, XDocument document)
+        public IAdaptable? GetAdaptableById(String id, XDocument document)
         {
             // Logger.Info($"NodeAdaptableRegistry.GetAdaptableById: Getting element by Id: {id}");
-            if(!_idMap.TryGetValue(GetIDKey(id, document), out var result))
+            if (!_idMap.TryGetValue(CreateIDKey(id, document), out var result))
                 return null;
             return result;
         }
@@ -33,26 +33,22 @@ namespace XMindAPI.Core.DOM
             // Logger.Info($"NodeAdaptableRegistry.GetAdaptableById: Getting element by Node: {node.NodeType}");
             return _nodeMap[node];
         }
-        public IAdaptable GetAdaptable(string id)
-        {
-            IAdaptable a = GetAdaptable(id, _defaultDocument);
-            return a;
-        }
+        public IAdaptable? GetAdaptable(string id) => GetAdaptable(id, _defaultDocument);
 
-        public IAdaptable GetAdaptable(string id, XDocument document)
+        public IAdaptable? GetAdaptable(string id, XDocument document)
         {
-            IAdaptable a = GetAdaptableById(id, document);
-            if(a == null)
+            IAdaptable? a = GetAdaptableById(id, document);
+            if (a == null)
             {
                 XElement element = DOMUtils.GetElementById(document, id);
-                if(element != null)
+                if (element != null)
                 {
                     a = GetAdaptableByNode(element);
-                    if(a == null)
+                    if (a == null)
                     {
                         a = _factory.CreateAdaptable(element);
                     }
-                    if(a != null)
+                    if (a != null)
                     {
                         RegisterByNode(a, element);
                         RegisterById(a, id, document);
@@ -61,17 +57,18 @@ namespace XMindAPI.Core.DOM
             }
             return a;
         }
-        public IAdaptable GetAdaptable(XNode node)
+        public IAdaptable? GetAdaptable(XNode node)
         {
-            if(node == null) return null;
-            if(!_nodeMap.TryGetValue(node, out IAdaptable a))
+            if (node is null)
+                return null;
+            if (!_nodeMap.TryGetValue(node, out IAdaptable? a))
             {
                 a = _factory.CreateAdaptable(node);
-                if(a != null)
+                if (a != null)
                 {
                     RegisterByNode(a, node);
-                    string id = GetId(node);
-                    if(id != null)
+                    var id = GetId(node);
+                    if (id != null)
                     {
                         RegisterById(a, id, node.Document);
                     }
@@ -87,7 +84,7 @@ namespace XMindAPI.Core.DOM
 
         public void UnregisterById(IAdaptable adaptable, string id, XDocument document)
         {
-            IDKey key = GetIDKey(id, document);
+            IDKey key = CreateIDKey(id, document);
             if (_idMap.TryGetValue(key, out IAdaptable a) && a.Equals(adaptable))
             {
                 // Logger.Info($"NodeAdaptableRegistry.UnregisterById: item was unregistered {adaptable}");
@@ -127,7 +124,7 @@ namespace XMindAPI.Core.DOM
         public void Register(IAdaptable adaptable, XNode node)
         {
             RegisterByNode(adaptable, node);
-            string id = GetId(node);
+            var id = GetId(node);
             if (id != null)
             {
                 RegisterById(adaptable, id, node.Document);
@@ -153,7 +150,7 @@ namespace XMindAPI.Core.DOM
         public void Unregister(IAdaptable adaptable, XNode node)
         {
             UnregisterByNode(adaptable, node);
-            String id = GetId(node);
+            var id = GetId(node);
             if (id != null)
             {
                 UnregisterById(adaptable, id, node.Document);
@@ -162,22 +159,16 @@ namespace XMindAPI.Core.DOM
 
         private IDKey CreateIDKey(string id, XDocument document)
         {
-            return new IDKey() { Id = id, Document = document };
+            return new IDKey(document, id);
         }
 
-        //TODO: consider to change
-        private IDKey GetIDKey(string id, XDocument document)
-        {
-            _key.Id = id;
-            _key.Document = document;
-            return _key;
-        }
-
-        private string GetId(XNode node)
+        private string? GetId(XNode node)
         {
             if (node.NodeType == System.Xml.XmlNodeType.Element)
             {
-                return (node as XElement).Attributes(ATTR_ID).First().Value;
+                XElement? xElement = node as XElement;
+                return xElement?.Attributes(ATTR_ID)
+                    ?.FirstOrDefault()?.Value;
             }
             return null;
         }

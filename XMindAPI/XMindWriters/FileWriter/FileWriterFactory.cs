@@ -5,13 +5,15 @@ using System.IO;
 
 using static XMindAPI.Configuration.XMindConfiguration;
 using XMindAPI.Configuration;
+using XMindAPI.Infrastructure.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace XMindAPI.Writers
 {
     public class FileWriterFactory
     {
 
-        public static List<IXMindWriter<IXMindWriterOutputConfig>> CreateStandardWriters(string basePath)
+        public static List<IXMindWriter<IXMindWriterOutputConfig>> CreateStandardWriters(string? basePath)
         {
             var standardOutputs = new List<FileWriterStandardOutput>{
                 FileWriterStandardOutput.Manifest,
@@ -30,18 +32,18 @@ namespace XMindAPI.Writers
             return standardOutputs.Select(o => CreateResolverFactoryMethod(o)).ToList();
         }
         public static IXMindWriter<IXMindWriterOutputConfig> CreateStandardWriterFactoryMethod(
-            FileWriterStandardOutput standardOutputType, string basePath)
+            FileWriterStandardOutput standardOutputType, string? basePath)
         {
-            var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
-
+            IConfiguration xMindSettings = EnsureXMindSettings();
             string fileName = standardOutputType switch
             {
                 FileWriterStandardOutput.Manifest => xMindSettings[ManifestLabel],
                 FileWriterStandardOutput.Meta => xMindSettings[MetaLabel],
                 FileWriterStandardOutput.Content => xMindSettings[ContentLabel],
-                _ => throw new InvalidOperationException("CreateWriterFactoryMethod haven't assigned writer")
+                _ => throw new InvalidOperationException(
+                    "CreateWriterFactoryMethod haven't assigned writer")
             };
-            bool useDefaultPath = basePath == null;
+            bool useDefaultPath = basePath is null;
             IXMindWriter<IXMindWriterOutputConfig> result;
 
             var writerConfig = new FileWriterOutputConfig(fileName, useDefaultPath);
@@ -55,6 +57,18 @@ namespace XMindAPI.Writers
             return result;
         }
 
+        private static IConfiguration EnsureXMindSettings()
+        {
+            var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
+            if (xMindSettings is null)
+            {
+                const string errorMessage = "XMindSettings are not provided";
+                Logger.Log.Error(errorMessage);
+                throw new InvalidOperationException(errorMessage);
+            }
+            return xMindSettings;
+        }
+
         public static Func<XMindWriterContext, List<IXMindWriter<IXMindWriterOutputConfig>>, IXMindWriter<IXMindWriterOutputConfig>> CreateResolverFactoryMethod(FileWriterStandardOutput standardOutputType) => standardOutputType switch
         {
             FileWriterStandardOutput.Manifest =>
@@ -63,7 +77,8 @@ namespace XMindAPI.Writers
                 (ctx, writers) => ResolveWriterByOutputName(ctx, writers, MetaLabel),
             FileWriterStandardOutput.Content =>
                 (ctx, writers) => ResolveWriterByOutputName(ctx, writers, ContentLabel),
-            _ => throw new InvalidOperationException("CreateResolverFactoryMethod haven't assigned binding")
+            _ => throw new InvalidOperationException(
+                "CreateResolverFactoryMethod haven't assigned binding")
         };
 
         private static IXMindWriter<IXMindWriterOutputConfig> ResolveWriterByOutputName(
@@ -71,9 +86,13 @@ namespace XMindAPI.Writers
             List<IXMindWriter<IXMindWriterOutputConfig>> writers,
             string fileLabel)
         {
-            var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
+            IConfiguration xMindSettings = EnsureXMindSettings();
             var file = xMindSettings[fileLabel];
-            var writerFound = writers.FirstOrDefault(w => context.FileName.Equals(file) && w.GetOutputConfig().OutputName.Equals(file));
+            var fileName = context.FileName;
+            var writerFound = writers.FirstOrDefault(
+                w => !string.IsNullOrWhiteSpace(fileName)
+                    && fileName!.Equals(file) // TODO: fix
+                    && w.GetOutputConfig().OutputName.Equals(file));
             return writerFound;
         }
     }

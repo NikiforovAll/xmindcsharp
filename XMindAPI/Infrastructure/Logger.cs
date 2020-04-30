@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.Tracing;
 
 namespace XMindAPI.Infrastructure.Logging
@@ -18,7 +19,17 @@ namespace XMindAPI.Infrastructure.Logging
         public void DebugTrace(string Message) { WriteEvent(4, Message); }
 
         [Event(5, Keywords = Keywords.Error, Message = "ErrorMessage: {0}", Channel = EventChannel.Debug, Level = EventLevel.Error)]
-        public void Error(string Message) { WriteEvent(5, Message); }
+        public void Error(string Message, Exception? e = null)
+        {
+            if (e is null)
+            {
+                WriteEvent(5, Message);
+            }
+            else
+            {
+                WriteEvent(5, Message, e);
+            }
+        }
 
         [Event(6, Keywords = Keywords.Error, Message = "ErrorMessage: {0}", Channel = EventChannel.Debug, Level = EventLevel.Warning)]
         public void Warning(string Message) { WriteEvent(6, Message); }

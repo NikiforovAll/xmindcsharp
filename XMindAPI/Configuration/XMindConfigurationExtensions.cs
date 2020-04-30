@@ -48,7 +48,7 @@ namespace XMindAPI.Extensions
             string? basePath)
         {
             var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
-            if (basePath == null)
+            if (basePath is null && xMindSettings is object)
             {
                 basePath = xMindSettings["output:base"];
             }

@@ -1,9 +1,6 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using XMindAPI;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 
@@ -14,7 +11,7 @@ namespace XMindAPI.Writers
         // private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
         // private IConfiguration _xMindSettings;
-        internal FileWriterOutputConfig OutputConfig { get; private set; }
+        internal FileWriterOutputConfig? OutputConfig { get; private set; }
 
         internal readonly bool _isAutoAddedResolver = false;
         internal readonly FileWriterStandardOutput _fileWriterStandardOutput;

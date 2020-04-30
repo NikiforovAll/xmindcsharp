@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using XMindAPI.Infrastructure.Logging;
 
 namespace XMindAPI.Configuration
 {
@@ -13,8 +14,6 @@ namespace XMindAPI.Configuration
     internal sealed class XMindConfigurationLoader
     {
         public IConfiguration? XMindConfigCollection { get; private set; }
-
-
 
         // TODO: consider to remove lazy instantiated dependency for static field
         // it is not possible to have control over this thing, nor to manage configuration life time
@@ -54,6 +53,7 @@ namespace XMindAPI.Configuration
         /// <returns>Mapping between manifest config token (label) to filename. [label => filename]</returns>
         internal Dictionary<string, string> GetOutputFilesDefinitions() => new Dictionary<string, string>
         {
+            #nullable disable
             [XMindConfiguration.ManifestLabel] = XMindConfigCollection[XMindConfiguration.ManifestLabel],
             [XMindConfiguration.MetaLabel] = XMindConfigCollection[XMindConfiguration.MetaLabel],
             [XMindConfiguration.ContentLabel] = XMindConfigCollection[XMindConfiguration.ContentLabel]
@@ -73,13 +73,13 @@ namespace XMindAPI.Configuration
                 }
                 XMindConfigCollection = builder.Build();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // TODO: remove and add proper exception handling
-                throw;
+                const string errorMessage = "Failed to load configuration file";
+                Logger.Log.Error(errorMessage, e);
+                throw new InvalidOperationException(errorMessage, e);
             }
             return this;
         }
-
     }
 }

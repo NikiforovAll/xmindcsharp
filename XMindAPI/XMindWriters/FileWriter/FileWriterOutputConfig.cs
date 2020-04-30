@@ -11,7 +11,7 @@ namespace XMindAPI.Writers
     {
         private readonly bool _useDefaultPath;
 
-        public string Path { get; private set; }
+        public string? Path { get; private set; }
         public string OutputName { get; set; }
 
         public FileWriterOutputConfig(string outputName)
@@ -26,9 +26,9 @@ namespace XMindAPI.Writers
         /// <param name="useDefaultPath">build Path based on xmindsettings.json file, basePath (output:base) and file location (output:files:[outputname]) is used</param>
         public FileWriterOutputConfig(string outputName, bool useDefaultPath) : this(outputName)
         {
-            if (useDefaultPath)
+            var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
+            if (useDefaultPath && xMindSettings is object)
             {
-                var xMindSettings = XMindConfigurationLoader.Configuration.XMindConfigCollection;
                 var basePath = xMindSettings["output:base"];
                 Dictionary<string, string> locations = XMindConfigurationLoader.Configuration.GetOutputFilesLocations();
                 var path = locations[outputName];
@@ -37,8 +37,7 @@ namespace XMindAPI.Writers
                     Path = System.IO.Path.Combine(basePath, path);
                 }
             }
-
-            this._useDefaultPath = useDefaultPath;
+            _useDefaultPath = useDefaultPath;
         }
 
         public IXMindWriterOutputConfig SetBasePath(string path)

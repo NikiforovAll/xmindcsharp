@@ -4,6 +4,6 @@ namespace XMindAPI.Core
 {
     interface INodeAdaptableFactory
     {
-        IAdaptable CreateAdaptable(XNode node);
+        IAdaptable? CreateAdaptable(XNode node);
     }
 }

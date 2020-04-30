@@ -21,35 +21,35 @@ namespace XMindAPI.Core
 
         public abstract ITopic CreateTopic();
 
-        public abstract object FindElement(string id, IAdaptable source);
+        public abstract object? FindElement(string id, IAdaptable source);
 
-        public ITopic FindTopic(string id, IAdaptable source)
+        public ITopic? FindTopic(string id, IAdaptable source)
         {
-            Object element = FindElement(id, source);
+            var element = FindElement(id, source);
             return element as ITopic;
         }
 
-        public ITopic FindTopic(string id)
+        public ITopic? FindTopic(string id)
         {
             return FindTopic(id, this);
         }
 
-        public T GetAdapter<T>(Type t)
+        public virtual T GetAdapter<T>(Type t)
         {
-            return default(T);
+            return default!;
         }
 
-        public object GetElementById(string id)
-        {
-            return FindElement(id, this);
-        }
-
-        public abstract ISheet GetPrimarySheet();
-
-        public abstract IEnumerable<ISheet> GetSheets();
-
-        public abstract void RemoveSheet(ISheet sheet);
-
-        public abstract Task Save();
+    public object? GetElementById(string id)
+    {
+        return FindElement(id, this);
     }
+
+    public abstract ISheet GetPrimarySheet();
+
+    public abstract IEnumerable<ISheet> GetSheets();
+
+    public abstract void RemoveSheet(ISheet sheet);
+
+    public abstract Task Save();
+}
 }

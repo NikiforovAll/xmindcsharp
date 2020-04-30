@@ -1,8 +1,9 @@
-using System;
+
+#nullable disable
 using System.Xml.Linq;
 using System.Linq;
-using static XMindAPI.Core.DOM.DOMConstants;
 using System.Collections.Generic;
+using static XMindAPI.Core.DOM.DOMConstants;
 
 namespace XMindAPI.Core.DOM
 {

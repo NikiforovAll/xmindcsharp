@@ -18,10 +18,7 @@ namespace XMindAPI.Utils
         }
         public static string GetAttribValue(XElement el, string attributeName)
         {
-            return el
-                .Attributes(attributeName)
-                .FirstOrDefault()?
-                .Value;
+            return el.Attribute(attributeName).Value;
         }
 
     }
