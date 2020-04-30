@@ -3,8 +3,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using XMindAPI.Configuration;
-using XMindAPI.Extensions;
+using XMindAPI;
 using XMindAPI.Models;
 using XMindAPI.Writers;
 
@@ -104,7 +103,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(zip: false)
                 .CreateWorkBook(workbookName: "test");
             //Assert
             book.GetPrimarySheet().Should().NotBeNull("because primary sheet is created by default");
@@ -115,7 +114,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: true)
+                .WithFileWriter(zip: true)
                 .CreateWorkBook(workbookName: "test");
 
             int numberOfSheets = 2;
@@ -134,7 +133,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(zip: false)
                 .CreateWorkBook(workbookName: "test");
             var sheet = book.CreateSheet();
             //Act
@@ -148,7 +147,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(zip: false)
                 .CreateWorkBook(workbookName: "test");
             var primarySheet = book.GetPrimarySheet();
             //Act
@@ -162,7 +161,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: false)
+                .WithFileWriter(zip: false)
                 .CreateWorkBook(workbookName: "FindTopic_Default_Success");
             //Act
             var topic = book.GetPrimarySheet().GetRootTopic();

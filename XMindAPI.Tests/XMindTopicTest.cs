@@ -1,13 +1,12 @@
 using FluentAssertions;
 using NUnit.Framework;
 using System.IO;
-using XMindAPI.Configuration;
-using XMindAPI.Extensions;
 using XMindAPI.Models;
 using XMindAPI.Writers;
 using System.Xml.XPath;
 using System.Linq;
 using static XMindAPI.Core.DOM.DOMConstants;
+using XMindAPI;
 
 namespace Tests
 {
@@ -38,7 +37,7 @@ namespace Tests
         {
             //Arrange
             var book = new XMindConfiguration()
-                .WithFileWriter(useDefaultPath: true, zip: true)
+                .WithFileWriter(zip: true)
                 .CreateWorkBook(workbookName: "test");
             string title = "Awesome topic";
             //Act

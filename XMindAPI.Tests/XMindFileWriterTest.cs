@@ -11,8 +11,6 @@ using NUnit.Framework;
 using FluentAssertions;
 
 using XMindAPI;
-using XMindAPI.Extensions;
-using XMindAPI.Configuration;
 using XMindAPI.Writers;
 using System.Threading.Tasks;
 

@@ -6,7 +6,7 @@ using XMindAPI.Core.Builders;
 using XMindAPI.Models;
 using System.Threading.Tasks;
 
-namespace XMindAPI.Configuration
+namespace XMindAPI
 
 {
     public class XMindConfiguration

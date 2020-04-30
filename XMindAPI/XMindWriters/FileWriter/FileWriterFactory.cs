@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
-using static XMindAPI.Configuration.XMindConfiguration;
+using static XMindAPI.XMindConfiguration;
 using XMindAPI.Configuration;
 using XMindAPI.Infrastructure.Logging;
 using Microsoft.Extensions.Configuration;

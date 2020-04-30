@@ -7,15 +7,25 @@ using System.IO;
 using System.Linq;
 using XMindAPI.Zip;
 
-namespace XMindAPI.Extensions
+// TODO: consider to change to XMindAPI.Extensions to follow convention
+// but this functionality is essential
+namespace XMindAPI
 {
     public static class XMindConfigurationExtensions
     {
         // TODO: add API to write to stream, minor because it is always possible to implement IXMindWriter
+
+        /// <summary>
+        /// Writes file to <paramref name="basePath"/>
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="basePath"></param>
+        /// <param name="zip"></param>
+        /// <returns></returns>
         public static XMindConfiguration WithFileWriter(
             this XMindConfiguration config,
             string? basePath = default,
-            bool zip = false)
+            bool zip = true)
         {
             var result = config
                 .WriteTo.Writers(FileWriterFactory.CreateStandardWriters(basePath))
@@ -26,9 +36,14 @@ namespace XMindAPI.Extensions
             }
             return result;
         }
+        /// <summary>
+        /// Write file to default location - "xmind-output"
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="zip"></param>
+        /// <returns></returns>
         public static XMindConfiguration WithFileWriter(
             this XMindConfiguration config,
-            bool useDefaultPath,
             bool zip = true)
         {
             return config.WithFileWriter(basePath: null, zip: zip);
