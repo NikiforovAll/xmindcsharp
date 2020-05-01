@@ -64,7 +64,7 @@ namespace XMindAPI.Models
         public void RemoveLabel(string label)
         {
             Implementation.Element(TAG_LABELS)
-                .Descendants(TAG_LABEL)
+                .Elements(TAG_LABEL)
                 .Where(elem => elem.Value
                     .Equals(label, StringComparison.InvariantCultureIgnoreCase))
                 .Remove();
@@ -79,7 +79,7 @@ namespace XMindAPI.Models
 
         public HashSet<string> GetLabels() =>
             new HashSet<string>(Implementation.Element(TAG_LABELS)
-                .Descendants().Select(elem => elem.Value));
+                .Elements().Select(elem => elem.Value));
 
 
         public void AddMarker(string markerId)
@@ -93,13 +93,13 @@ namespace XMindAPI.Models
         public void RemoveMarker(string markerId)
         {
             Implementation.Element(TAG_MARKER_REFS)
-                ?.Descendants()
+                ?.Elements()
                 .Where(elem => elem.Attribute(ATTR_MARKER_ID).Value?.Equals(markerId) ?? false)
                 .Remove();
         }
 
         public bool HasMarker(string markerId) => Implementation.Element(TAG_MARKER_REFS)
-                ?.Descendants()
+                ?.Elements()
                 ?.Any(elem => elem.Attribute(ATTR_MARKER_ID).Value?.Equals(markerId) ?? false) ?? false;
 
         public string GetId()
@@ -144,8 +144,8 @@ namespace XMindAPI.Models
             // child.Type = type;
             // Add children tag
             DOMUtils.EnsureChildElement(Implementation, TAG_CHILDREN);
-            var childrenTag = Implementation.Descendants(TAG_CHILDREN).Single();
-            XElement? tagTopics = childrenTag.Descendants(TAG_TOPICS)
+            var childrenTag = Implementation.Elements(TAG_CHILDREN).Single();
+            XElement? tagTopics = childrenTag.Elements(TAG_TOPICS)
                 ?.FirstOrDefault(elem => elem.Attribute(ATTR_TYPE)?.Value == typeName);
             if (tagTopics is null)
             {

@@ -1,13 +1,11 @@
 ﻿using System.IO;
 using System;
-using XMindAPI.Configuration;
-using XMindAPI.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using System.Diagnostics.Tracing;
 using System.Text;
-using XMindAPI.Core;
+using XMindAPI;
 
 namespace simple
 {

@@ -1,25 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xmap-content xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" version="2.0" xmlns="urn:xmind:xmap:xmlns:content:2.0">
-  <sheet id="e7c5eb24575a4f64b1e9dd40bf3916e9" xmlns="">
-    <topic id="2318762798ce422a8c97ca730d4cb07b">
-      <title>RootTopic</title>
+  <sheet id="d700b92a14a44a01b1c84df69aaaa022" xmlns="">
+    <topic id="89bc4b415d864eb2ae804c70241fc301">
       <children>
         <topics type="attached">
-          <topic id="537a7a23d07e45f5846d255e38bf1891" branch="folded" href="http://google.com">
-            <title>ChildTopic</title>
-            <marker-refs>
-              <marker marker-id="priority-1" />
-            </marker-refs>
-            <children>
-              <topics type="attached">
-                <topic id="8db9ad8b8b1f4a468450a2124a80e4be">
-                  <title>Folded</title>
-                </topic>
-                <topic id="8db9ad8b8b1f4a468450a2124a80e4be">
-                  <title>Folded</title>
-                </topic>
-              </topics>
-            </children>
+          <topic id="1ed2dde0d6444587b9fcaabff9a15fcc">
+            <title>Patterns</title>
+          </topic>
+          <topic id="09bcf553191e4f2388a35da7048cdeb9">
+            <title>Software Craftsmanship</title>
+          </topic>
+          <topic id="4591c5afb6264b6f8eb4e1f3e3e9b2ba">
+            <title>.NET</title>
+          </topic>
+          <topic id="758497bc9f2447aaa97e25f6088ae471">
+            <title>.NET Core</title>
+          </topic>
+          <topic id="1ecc834797a944e7815a9518f5608b8a">
+            <title>System Design</title>
+          </topic>
+          <topic id="6b6784e222c94bebb3a51f7bd66940ac">
+            <title>ASP.NET Core</title>
+          </topic>
+          <topic id="bf8052541c4e48e5a907d120375327b3">
+            <title>Unit Testing</title>
           </topic>
         </topics>
       </children>
