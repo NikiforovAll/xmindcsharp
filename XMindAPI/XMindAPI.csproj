@@ -23,6 +23,10 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference> -->
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
+		<Content Include="./xmindsettings.json">
+			<Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<PropertyGroup>

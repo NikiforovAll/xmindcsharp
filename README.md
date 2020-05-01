@@ -2,13 +2,30 @@
 
 XMind API that allows to build .xmind files programmatically
 
-## Getting Started
-
-### Installing
+## Install
 
 ```bash
-dotnet add package XMindCsharp
+dotnet add package XMindCsharp --version X.Y.Z
 ```
+
+## Getting Started
+
+```csharp
+var book = new XMindConfiguration()
+                .WithFileWriter("./output", zip: true)
+                .CreateWorkBook(workbookName: "test.xmind");
+var sheet = book.CreateSheet();
+book.AddSheet(sheet, 0); //replaced primary sheet
+```
+
+* Example application could be found at: [examples/simple](https://github.com/NikiforovAll/xmindcsharp/tree/master/examples/simple)
+* See [XMindAPI.Tests](https://github.com/NikiforovAll/xmindcsharp/tree/master/XMindAPI.Tests)  for more details and examples.
+
+### Example
+
+Here is what you can do with it: ![edu-scope-to-mindmap](docs/example_output1.png)
+
+Full source code could be found at [edu-scope-to-mindmap](https://github.com/NikiforovAll/edu-scope-to-mindmap).
 
 ## Running the tests
 
@@ -20,14 +37,9 @@ dotnet test ./XMindAPI.Tests/
 
 ## Scope
 
-## Info
+## ContributE
 
-* <https://github.com/xmindltd/xmind/wiki/XMindFileFormat>
-* <https://github.com/xmindltd/xmind/wiki/UsingXmindAPI>
-
-## Contributing
-
-### Git Commit Guidelines
+Git Commit Guidelines:
 
 ```text
 <type>[optional scope]: <description>
@@ -59,6 +71,11 @@ The following is the list of supported scopes:
 * readme
 * core_functionality
 * [TBD]
+
+## Info
+
+* <https://github.com/xmindltd/xmind/wiki/XMindFileFormat>
+* <https://github.com/xmindltd/xmind/wiki/UsingXmindAPI>
 
 ## Authors
 
