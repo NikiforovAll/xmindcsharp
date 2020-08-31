@@ -37,7 +37,7 @@
 		<Description>XMind API that allows to build .xmind files programmatically</Description>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<DocumentationFile>bin\XMindAPI.xml</DocumentationFile>
-		<IncludeSymbols>true</IncludeSymbols>
+		<!-- <IncludeSymbols>true</IncludeSymbols> -->
 	</PropertyGroup>
 
 	<PropertyGroup>
