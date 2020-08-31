@@ -37,7 +37,7 @@ dotnet test ./XMindAPI.Tests/
 
 ## Scope
 
-## ContributE
+## Contribute
 
 Git Commit Guidelines:
 
